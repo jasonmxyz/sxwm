@@ -18,3 +18,6 @@ $(OBJ): %.o : %.c $(DEP)
 
 sxwm: % : $(OBJ)
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
+
+test: sxwm
+	xinit ./sxwm -- $$(which Xephyr) :1 -ac -br -screen 800x600
