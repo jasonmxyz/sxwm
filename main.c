@@ -6,6 +6,7 @@ Window root;      // The root window of this display
 bool existsWM;    // Is there already a window manager running on this display
 
 int detectWM(Display* display, XErrorEvent* e);
+int errorHandler(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
@@ -31,8 +32,36 @@ int main(int argc, char** argv) {
 		die("There is already a window manager running on this display.");
 	}
 
+	// Set the final error handler
+	XSetErrorHandler(errorHandler);
+
+	// Infinite message loop
+	while (true) {
+		XEvent e;
+		XNextEvent(display, &e);
+
+		#ifdef VERBOSE
+		printf("Recieved event.\n");
+		#endif
+
+		switch (e.type) {
+			default:
+				#ifdef VERBOSE
+				printf(" Ignored event");
+				#endif
+		}
+	}
+
 	XCloseDisplay(display);
 
+	return 0;
+}
+
+// An error handler which does nothing.
+int errorHandler(Display* display, XErrorEvent* e) {
+	#ifdef VERBOSE
+	printf("Handling error.\n");
+	#endif
 	return 0;
 }
 

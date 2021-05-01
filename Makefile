@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c99 -g
+CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
 FILES := main util
