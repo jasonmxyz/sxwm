@@ -2,7 +2,7 @@ CC := gcc
 CFLAGS := -std=c99 -g
 LIBS := -lX11
 
-FILES := main
+FILES := main util
 OBJ := $(addsuffix .o, $(FILES) )
 DEP := header.h Makefile
 
