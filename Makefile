@@ -2,9 +2,10 @@ CC := gcc
 CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
-FILES := main util
+FILES := main util clientList
+HEADERS := global.h clientList.h
 OBJ := $(addsuffix .o, $(FILES) )
-DEP := header.h Makefile
+DEP := $(HEADERS) Makefile
 
 .PHONY: all clean
 

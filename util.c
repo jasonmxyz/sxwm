@@ -1,4 +1,8 @@
-#include "header.h"
+#include "global.h"
+
+#include <stdio.h>
+#include <libgen.h>
+#include <stdlib.h>
 
 extern char** g_argv;
 

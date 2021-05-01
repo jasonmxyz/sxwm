@@ -1,15 +1,23 @@
-#include "header.h"
+#include "global.h"
+#include "clientList.h"
+
+#include <X11/Xlib.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 char** g_argv;    // Copy of argv to use in other functions
 Display* display; // The X display to connected to
 Window root;      // The root window of this display
 bool existsWM;    // Is there already a window manager running on this display
 
+extern Client* clients;
+
 int detectWM(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
+	clients = NULL; // Initialise client list to null.
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
