@@ -11,14 +11,11 @@ Display* display; // The X display to connected to
 Window root;      // The root window of this display
 bool existsWM;    // Is there already a window manager running on this display
 
-extern Client* clients;
-
 int detectWM(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
-	clients = NULL; // Initialise client list to null.
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
@@ -110,8 +107,38 @@ int main(int argc, char** argv) {
 				XMapWindow(display, e.xmaprequest.window);
 
 				#ifdef VERBOSE
-				printf("Completed Map Request\n");
+				printf(" Completed\n");
 				#endif
+
+				break;
+			}
+			case UnmapNotify: {
+				#ifdef VERBOSE
+				printf("Recieved Unmap Notification\n");
+				#endif
+				// When a window has been unmapped, we need to destory the frame and reparent the
+				// client under the root window. We don't need to do this for the frame itself.
+				Window framed = getClientFrame(e.xunmap.window);
+				if (framed == (Window)NULL) {
+					#ifdef VERBOSE
+					printf(" Not responding because this is a frame\n");
+					#endif
+					break;
+				}
+
+				// Reparent the client, and destroy the frame
+				XUnmapWindow(display, framed);
+				XReparentWindow(display, e.xunmap.window, root, 0, 0);
+				XRemoveFromSaveSet(display, e.xunmap.window);
+				XDestroyWindow(display, framed);
+				// Remove the client from the linked list
+				removeClient(e.xunmap.window);
+
+				#ifdef VERBOSE
+				printf(" Removed client\n");
+				#endif
+
+				break;
 			}
 			default:
 				#ifdef VERBOSE
