@@ -1,5 +1,6 @@
 #include "util.h"
 #include "clientList.h"
+#include "tile.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -69,6 +70,9 @@ void mapRequest(XEvent e) {
 	XMapWindow(display, framed);
 	XMapWindow(display, e.xmaprequest.window);
 
+	// Tile the windows
+	tile();
+
 	#ifdef VERBOSE
 	printf(" Completed\n");
 	#endif
@@ -95,6 +99,9 @@ void unmapNotify(XEvent e) {
 	XDestroyWindow(display, framed);
 	// Remove the client from the linked list
 	removeClient(e.xunmap.window);
+
+	// Tile the windows
+	tile();
 
 	#ifdef VERBOSE
 	printf(" Removed client\n");

@@ -2,8 +2,8 @@ CC := gcc
 CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
-FILES := main util clientList handlers monitors
-HEADERS := util.h clientList.h handlers.h monitors.h
+FILES := main util clientList handlers monitors tile
+HEADERS := util.h clientList.h handlers.h monitors.h tile.h
 OBJ := $(addsuffix .o, $(FILES) )
 DEP := $(HEADERS) Makefile
 
@@ -21,4 +21,4 @@ sxwm: % : $(OBJ)
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
 
 test: sxwm
-	xinit ./sxwm -- $$(which Xephyr) :1 -ac -br -screen 800x600
+	xinit ./sxwm -- $$(which Xephyr) :1 -ac -br -screen 1280x720

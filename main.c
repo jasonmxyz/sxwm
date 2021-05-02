@@ -2,14 +2,17 @@
 #include "clientList.h"
 #include "handlers.h"
 #include "monitors.h"
+#include "tile.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
-char** g_argv;    // Copy of argv to use in other functions
-Display* display; // The X display to connected to
-Window root;      // The root window of this display
+char** g_argv;         // Copy of argv to use in other functions
+Display* display;      // The X display to connected to
+Window root;           // The root window of this display
+void* settings = NULL; // The settings structure
 
 int detectWM(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
@@ -35,6 +38,11 @@ int main(int argc, char** argv) {
 
 	// Populate the screen structure with the geometry of the display
 	getMonitors();
+
+	// Create the settings structure with the default settings
+	settings = malloc(sizeof(tileSettings));
+	((tileSettings*)settings)->masterCount = 1;
+	((tileSettings*)settings)->masterRatio = 0.6;
 
 	// Infinite message loop
 	while (true) {
