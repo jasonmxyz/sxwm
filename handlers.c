@@ -14,9 +14,6 @@ extern Window root;
 void configureRequest(XEvent e) {
 	// Can be recieved multiple times while an application is running, so best not to
 	// do much.
-	#ifdef VERBOSE
-	printf("Recieved Configure Request\n");
-	#endif
 
 	// A structure to indicate no changes being done to the window.
 	XWindowChanges c;
@@ -30,26 +27,14 @@ void configureRequest(XEvent e) {
 
 	// The window which frames this one also needs to be reconfigured (if it exists)
 	Window frame = getClientFrame(e.xconfigurerequest.window);
-	if (frame != (Window)NULL) {
+	if (frame != (Window)NULL)
 		XConfigureWindow(display, frame, e.xconfigurerequest.value_mask, &c);
-		#ifdef VERBOSE
-		printf(" Configured window frame\n");
-		#endif
-	}
 
 	// Allow the window to be configured
 	XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);
-
-	#ifdef VERBOSE
-	printf(" Configured window\n");
-	#endif
 }
 
 void mapRequest(XEvent e) {
-	#ifdef VERBOSE
-	printf("Recieved Map Request\n");
-	#endif
-
 	// Copy the attributes of the window to be created, so that we can create a new one
 	// to frame it
 	XWindowAttributes attrs;
@@ -77,25 +62,13 @@ void mapRequest(XEvent e) {
 
 	// Tile the windows
 	tile();
-
-	#ifdef VERBOSE
-	printf(" Completed\n");
-	#endif
 }
 
 void unmapNotify(XEvent e) {
-	#ifdef VERBOSE
-	printf("Recieved Unmap Notification\n");
-	#endif
 	// When a window has been unmapped, we need to destory the frame and reparent the
 	// client under the root window. We don't need to do this for the frame itself.
 	Window framed = getClientFrame(e.xunmap.window);
-	if (framed == (Window)NULL) {
-		#ifdef VERBOSE
-		printf(" Not responding because this is a frame\n");
-		#endif
-		return;
-	}
+	if (framed == (Window)NULL) return;
 
 	// Reparent the client, and destroy the frame
 	XUnmapWindow(display, framed);
@@ -107,8 +80,4 @@ void unmapNotify(XEvent e) {
 
 	// Tile the windows
 	tile();
-
-	#ifdef VERBOSE
-	printf(" Removed client\n");
-	#endif
 }

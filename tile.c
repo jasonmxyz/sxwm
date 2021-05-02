@@ -12,9 +12,6 @@ extern Display* display;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
-	#ifdef VERBOSE
-	printf("Tiling windows.\n");
-	#endif
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = clients; c != NULL; c=c->next)

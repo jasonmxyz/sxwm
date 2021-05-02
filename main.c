@@ -76,9 +76,6 @@ int main(int argc, char** argv) {
 				motionNotify(e);
 				break;
 			default:
-				#ifdef VERBOSE
-				printf("Ignored event\n");
-				#endif
 				break;
 		}
 	}
@@ -90,9 +87,6 @@ int main(int argc, char** argv) {
 
 // An error handler which does nothing.
 int errorHandler(Display* display, XErrorEvent* e) {
-	#ifdef VERBOSE
-	printf("Handling error.\n");
-	#endif
 	return 0;
 }
 

@@ -15,8 +15,4 @@ void getMonitors() {
 	int s = DefaultScreen(display);
 	monitor->width = DisplayWidth(display, s);
 	monitor->height = DisplayHeight(display, s);
-
-	#ifdef VERBOSE
-	printf("Detected screen size: %dx%d\n", monitor->width, monitor->height);
-	#endif
 }
