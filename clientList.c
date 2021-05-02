@@ -48,6 +48,7 @@ void removeClient(Window window) {
 			clientCount--;
 			return;
 		}
+		current = current->next;
 	}
 
 	// Die if something goes wrong
