@@ -7,6 +7,8 @@
 #include <X11/Xlib.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
+#include <X11/Xutil.h>
+#include <string.h>
 
 extern Display* display;
 extern Window root;
@@ -35,6 +37,16 @@ void configureRequest(XEvent e) {
 }
 
 void mapRequest(XEvent e) {
+	// Check whether this is the bar
+	XClassHint wclass = {NULL, NULL};
+	XGetClassHint(display, e.xmaprequest.window, &wclass);
+	printf("%s  -  %s\n", wclass.res_name, wclass.res_class);
+	if (strcmp(wclass.res_name, "sxwm") == 0 && strcmp(wclass.res_class, "sxwm-bar") == 0) {
+		printf("this is the bar\n");
+		XMapWindow(display, e.xmaprequest.window);
+		return;
+	}
+
 	// Copy the attributes of the window to be created, so that we can create a new one
 	// to frame it
 	XWindowAttributes attrs;

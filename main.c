@@ -4,6 +4,7 @@
 #include "monitors.h"
 #include "tile.h"
 #include "input.h"
+#include "bar.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -23,6 +24,8 @@ int detectWM(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
+	
+	createBar();
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
