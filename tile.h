@@ -2,8 +2,9 @@
 
 typedef struct tileSettings tileSettings;
 struct tileSettings {
-	int masterCount;
 	float masterRatio;
+	int masterCount;
+	int gapSize;
 };
 
 void tile();

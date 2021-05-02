@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
 	settings = malloc(sizeof(tileSettings));
 	((tileSettings*)settings)->masterCount = 1;
 	((tileSettings*)settings)->masterRatio = 0.6;
+	((tileSettings*)settings)->gapSize = 10;
 	
 	// Infinite message loop
 	while (true) {
