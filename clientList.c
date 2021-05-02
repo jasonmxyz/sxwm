@@ -9,6 +9,7 @@ int clientCount = 0;
 void addClient(Client* client) {
 	(*client).next = clients;
 	clients = client;
+	clientCount++;
 }
 
 // Get the frame window given the client window
@@ -33,6 +34,7 @@ void removeClient(Window window) {
 		Client* temp = clients->next;
 		free(clients);
 		clients = temp;
+		clientCount--;
 		return;
 	}
 
@@ -43,6 +45,7 @@ void removeClient(Window window) {
 			Client* next = (current->next)->next;
 			free(current->next);
 			current->next = next;
+			clientCount--;
 			return;
 		}
 	}
