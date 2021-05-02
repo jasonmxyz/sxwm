@@ -19,6 +19,7 @@ void* settings = NULL; // The settings structure
 bool running;
 
 int barHeight = 30;
+int borderWidth = 1;
 
 int detectWM(Display* display, XErrorEvent* e);
 

@@ -8,6 +8,7 @@ struct Client {
 	Window frame;
 	Window window;
 	Client* next;
+	Client* previous;
 	bool floating;
 };
 

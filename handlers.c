@@ -12,6 +12,7 @@
 
 extern Display* display;
 extern Window root;
+extern int borderWidth;
 
 void configureRequest(XEvent e) {
 	// Can be recieved multiple times while an application is running, so best not to
@@ -54,12 +55,12 @@ void mapRequest(XEvent e) {
 
 	// Create this window with a border to surround e.xmaprequest.window and save it to
 	// the set of all windows for X
-	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, 2, 0x3333ff, 0xffffff);
+	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, borderWidth, 0x3333ff, 0xffffff);
 	XSelectInput(display, framed, SubstructureRedirectMask | SubstructureNotifyMask);
 	XAddToSaveSet(display, e.xmaprequest.window);
 
 	// Add a new client structure to the linked list of all clients
-	Client* newClient = malloc(sizeof(Client));
+	Client* newClient = calloc(1, sizeof(Client));
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;

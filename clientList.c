@@ -7,8 +7,9 @@ int clientCount = 0;
 
 // Add a client to the front of the list
 void addClient(Client* client) {
-	(*client).next = clients;
+	client->next = clients;
 	clients = client;
+	if(clients->next != NULL) (clients->next)->previous = clients;
 	clientCount++;
 }
 
@@ -26,33 +27,16 @@ Window getClientFrame(Window window) {
 
 // Removes a client from the list given the client window
 void removeClient(Window window) {
-	// If the list is empty, then we cannot remove anything
-	if (clients == NULL) die("There are no clients windows, one can't be removed.");
-
-	// If the client is at the front of the list
-	if (clients->window == window) {
-		Client* temp = clients->next;
-		free(clients);
-		clients = temp;
-		clientCount--;
-		return;
-	}
-
-	// Otherwise, continue until we reach the end of the list
-	Client* current = clients;
-	while (current->next != NULL) {
-		if ((current->next)->window == window) {
-			Client* next = (current->next)->next;
-			free(current->next);
-			current->next = next;
+	for (Client* c = clients; c != NULL; c = c->next) {
+		if (c->window == window) {
+			if (c->previous != NULL) (c->previous)->next = c->next;
+			else clients = c->next;
+			if (c->next != NULL) (c->next)->previous = c->previous;
 			clientCount--;
+			free(c);
 			return;
 		}
-		current = current->next;
 	}
-
-	// Die if something goes wrong
-	die("The given window could not be found in the list.");
 }
 
 // Return the Client* associated with a window

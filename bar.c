@@ -7,6 +7,7 @@
 #include <X11/Xutil.h>
 
 Window bar = (Window)NULL;
+extern int barHeight;
 
 void createBar() {
 	int result = fork();
@@ -18,7 +19,7 @@ void createBar() {
 	int s = DefaultScreen(d);
 	int width = DisplayWidth(d, s);
 	XClassHint wc = {"sxwm", "sxwm-bar"};
-	Window w = XCreateSimpleWindow(d, RootWindow(d,s), 0, 0, width, 30, 1, BlackPixel(d,s), WhitePixel(d,s));
+	Window w = XCreateSimpleWindow(d, RootWindow(d,s), 0, 0, width, barHeight, 0, BlackPixel(d,s), WhitePixel(d,s));
 	XSelectInput(d, w, ExposureMask | KeyPressMask);
 	XSetClassHint(d, w, &wc);
 	XMapWindow(d,w);

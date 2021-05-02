@@ -10,6 +10,7 @@ extern Client* clients;
 extern int clientCount;
 extern Display* display;
 extern int barHeight;
+extern int borderWidth;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
