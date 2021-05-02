@@ -5,8 +5,11 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/keysym.h>
 
 extern Display* display;
+extern Window root;
+extern bool running;
 
 Point mouseDownPos;
 Point initialFramedPos;
@@ -16,6 +19,13 @@ void keyPress(XEvent e) {
 	#ifdef VERBOSE
 	printf("Recieved Key Press Event\n");
 	#endif
+
+	// If the input is on the root window
+	if (e.xkey.window == root) {
+		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_q))) {
+			running = false;
+		}
+	}
 	
 	// Get client associated with this window. If there isn't one, then do nothing
 	Client* c = getClientByWindow(e.xkey.window);

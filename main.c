@@ -9,11 +9,13 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <X11/keysym.h>
 
 char** g_argv;         // Copy of argv to use in other functions
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
 void* settings = NULL; // The settings structure
+bool running;
 
 int detectWM(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
@@ -45,9 +47,12 @@ int main(int argc, char** argv) {
 	((tileSettings*)settings)->masterCount = 1;
 	((tileSettings*)settings)->masterRatio = 0.6;
 	((tileSettings*)settings)->gapSize = 10;
+
+	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
-	while (true) {
+	running = true;
+	while (running) {
 		XEvent e;
 		XNextEvent(display, &e);
 		
