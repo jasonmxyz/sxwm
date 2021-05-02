@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <X11/keysym.h>
 
 extern Display* display;
 extern Window root;
@@ -71,13 +70,21 @@ void buttonPress(XEvent e) {
 	// Get client associated with this window. If there isn't one, then do nothing
 	Client* c = getClientByWindow(e.xbutton.window);
 	if (c == NULL) return;
-
-	// Record the position the mouse was clicked, and the position of the window
-	mouseDownPos.x = e.xbutton.x_root;
-	mouseDownPos.y = e.xbutton.y_root;
+	
+	// Get the geometry of the window
 	Window r;// unused variables
 	unsigned int bw, d;
 	XGetGeometry(display, c->frame, &r, &(initialFramedPos.x), &(initialFramedPos.y), &(initialFramedSize.x), &(initialFramedSize.y), &bw, &d);
+
+	// If right clicking, then move the mouse to the buttom right corner of the window.
+	if (e.xbutton.button == Button3) {
+		mouseDownPos.x = initialFramedPos.x + initialFramedSize.x;
+		mouseDownPos.y = initialFramedPos.y + initialFramedSize.y;
+	} else {
+		// Record the position the mouse was clicked, and the position of the window
+		mouseDownPos.x = e.xbutton.x_root;
+		mouseDownPos.y = e.xbutton.y_root;
+	}
 
 	// Make sure the clicked window is on top
 	XRaiseWindow(display, c->frame);
@@ -87,6 +94,17 @@ void motionNotify(XEvent e) {
 	// Get client associated with this window. If there isn't one, then do nothing
 	Client* c = getClientByWindow(e.xmotion.window);
 	if (c == NULL) return;
+
+	// If a window is being resized
+	if (e.xmotion.state & Button3Mask) {
+		// Resize both the window and its frame
+		XResizeWindow(display, c->frame, initialFramedSize.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedSize.y - (mouseDownPos.y - e.xmotion.y_root));
+		XResizeWindow(display, c->window, initialFramedSize.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedSize.y - (mouseDownPos.y - e.xmotion.y_root));
+		if (!(c->floating)) {
+			c->floating = true;
+			tile();
+		}
+	}
 
 	// If a window was dragged
 	if (e.xmotion.state & Button1Mask) {
