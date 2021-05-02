@@ -27,9 +27,10 @@ void keyPress(XEvent e) {
 		printf(" Toggle window floating mode\n");
 		#endif
 		// Toggle floating, call the tile method, and bring the window frame to the front
+		if (c->floating) XLowerWindow(display, c->frame);
+		else XRaiseWindow(display, c->frame);
 		c->floating = c->floating ? false : true;
 		tile();
-		XRaiseWindow(display, c->frame);
 		return;
 	}
 }
