@@ -9,7 +9,6 @@
 char** g_argv;    // Copy of argv to use in other functions
 Display* display; // The X display to connected to
 Window root;      // The root window of this display
-bool existsWM;    // Is there already a window manager running on this display
 
 int detectWM(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
@@ -25,18 +24,10 @@ int main(int argc, char** argv) {
 	root = XDefaultRootWindow(display);
 
 	// Attempt to select substructure redirection on the root window.
-	// An error should only occur when there is already a window manager running, so the error
-	// handler will set existWM to true.
-	existsWM = false;
+	// An error should only occur when there is already a window manager running, causing death.
 	XSetErrorHandler(detectWM);
 	XSelectInput(display, root, SubstructureRedirectMask | SubstructureNotifyMask);
 	XSync(display, false);
-
-	// If we detected another window manager, we must stop.
-	if (existsWM) {
-		XCloseDisplay(display);
-		die("There is already a window manager running on this display.");
-	}
 
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
@@ -144,6 +135,7 @@ int main(int argc, char** argv) {
 				#ifdef VERBOSE
 				printf("Ignored event\n");
 				#endif
+				break;
 		}
 	}
 
@@ -163,6 +155,6 @@ int errorHandler(Display* display, XErrorEvent* e) {
 // An error handler which sets the boolean existsWM if an error occurs while selecting substructure
 // redirection.
 int detectWM(Display* display, XErrorEvent* e) {
-	existsWM = true;
-	return 0;
+	die("There is already a window manager running on this display.");
+	return 1;
 }
