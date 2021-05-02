@@ -14,3 +14,4 @@ struct Client {
 void addClient(Client* client);
 Window getClientFrame(Window window);
 void removeClient(Window window);
+Client* getClient(Window window);

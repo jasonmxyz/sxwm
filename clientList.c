@@ -53,3 +53,15 @@ void removeClient(Window window) {
 	// Die if something goes wrong
 	die("The given window could not be found in the list.");
 }
+
+// Return the Client* associated with a window
+Client* getClient(Window window) {
+	Client* current = clients;
+	while (current != NULL) {
+		if (current->window == window) {
+			return current;
+		}
+		current = current->next;
+	}
+	return NULL;
+}
