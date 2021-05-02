@@ -55,7 +55,7 @@ void removeClient(Window window) {
 }
 
 // Return the Client* associated with a window
-Client* getClient(Window window) {
+Client* getClientByWindow(Window window) {
 	Client* current = clients;
 	while (current != NULL) {
 		if (current->window == window) {
