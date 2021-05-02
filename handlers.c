@@ -63,6 +63,7 @@ void mapRequest(XEvent e) {
 	Client* newClient = malloc(sizeof(Client));
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
+	newClient->floating = true;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame
