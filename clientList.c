@@ -1,5 +1,5 @@
 #include "clientList.h"
-#include "global.h"
+#include "util.h"
 #include <stdlib.h>
 
 Client* clients = NULL;

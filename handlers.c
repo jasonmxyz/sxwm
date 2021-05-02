@@ -1,4 +1,4 @@
-#include "global.h"
+#include "util.h"
 #include "clientList.h"
 
 #include <stdio.h>

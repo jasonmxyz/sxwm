@@ -3,7 +3,7 @@ CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
 FILES := main util clientList handlers
-HEADERS := global.h clientList.h handlers.h
+HEADERS := util.h clientList.h handlers.h
 OBJ := $(addsuffix .o, $(FILES) )
 DEP := $(HEADERS) Makefile
 

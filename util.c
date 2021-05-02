@@ -1,5 +1,3 @@
-#include "global.h"
-
 #include <stdio.h>
 #include <libgen.h>
 #include <stdlib.h>
