@@ -1,6 +1,7 @@
 #include "util.h"
 #include "clientList.h"
 #include "handlers.h"
+#include "monitors.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -31,6 +32,9 @@ int main(int argc, char** argv) {
 
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
+
+	// Populate the screen structure with the geometry of the display
+	getMonitors();
 
 	// Infinite message loop
 	while (true) {
@@ -68,8 +72,7 @@ int errorHandler(Display* display, XErrorEvent* e) {
 	return 0;
 }
 
-// An error handler which sets the boolean existsWM if an error occurs while selecting substructure
-// redirection.
+// An error handler which dies if there is a window manager already present.
 int detectWM(Display* display, XErrorEvent* e) {
 	die("There is already a window manager running on this display.");
 	return 1;
