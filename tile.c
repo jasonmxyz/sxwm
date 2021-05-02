@@ -18,7 +18,7 @@ void tile() {
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = clients; c != NULL; c=c->next)
-		if (c->floating) toTile++;
+		if (!(c->floating)) toTile++;
 	
 	// Determine the dimensions for master and slave windows
 	int mw = toTile > settings->masterCount ? (int)(monitor->width * settings->masterRatio) : monitor->width;

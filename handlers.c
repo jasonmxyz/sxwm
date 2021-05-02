@@ -1,10 +1,12 @@
 #include "util.h"
 #include "clientList.h"
 #include "tile.h"
+#include "keys.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <stdlib.h>
+#include <X11/keysym.h>
 
 extern Display* display;
 extern Window root;
@@ -63,12 +65,13 @@ void mapRequest(XEvent e) {
 	Client* newClient = malloc(sizeof(Client));
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
-	newClient->floating = true;
+	newClient->floating = false;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame
 	XReparentWindow(display, e.xmaprequest.window, framed, 0, 0);
 	XMapWindow(display, framed);
+	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
 	XMapWindow(display, e.xmaprequest.window);
 
 	// Tile the windows

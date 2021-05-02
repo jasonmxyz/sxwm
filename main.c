@@ -3,6 +3,7 @@
 #include "handlers.h"
 #include "monitors.h"
 #include "tile.h"
+#include "keys.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -43,7 +44,7 @@ int main(int argc, char** argv) {
 	settings = malloc(sizeof(tileSettings));
 	((tileSettings*)settings)->masterCount = 1;
 	((tileSettings*)settings)->masterRatio = 0.6;
-
+	
 	// Infinite message loop
 	while (true) {
 		XEvent e;
@@ -58,6 +59,9 @@ int main(int argc, char** argv) {
 				break;
 			case UnmapNotify:
 				unmapNotify(e);
+				break;
+			case KeyPress:
+				keyPress(e);
 				break;
 			default:
 				#ifdef VERBOSE

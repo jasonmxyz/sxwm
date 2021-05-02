@@ -2,8 +2,8 @@ CC := gcc
 CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
-FILES := main util clientList handlers monitors tile
-HEADERS := util.h clientList.h handlers.h monitors.h tile.h
+FILES := main util clientList handlers monitors tile keys
+HEADERS := util.h clientList.h handlers.h monitors.h tile.h keys.h
 OBJ := $(addsuffix .o, $(FILES) )
 DEP := $(HEADERS) Makefile
 
