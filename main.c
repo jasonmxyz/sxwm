@@ -17,6 +17,8 @@ Window root;           // The root window of this display
 void* settings = NULL; // The settings structure
 bool running;
 
+int barHeight = 30;
+
 int detectWM(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {

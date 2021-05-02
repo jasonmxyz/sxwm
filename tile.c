@@ -9,6 +9,7 @@ extern Monitor* monitor;
 extern Client* clients;
 extern int clientCount;
 extern Display* display;
+extern int barHeight;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
@@ -24,14 +25,14 @@ void tile() {
 	int mw, mh, sw, sh;
 	if (settings->masterCount >= toTile) {
 		mw = monitor->width - (2 * settings->gapSize);
-		mh = (int)((monitor->height - (settings->gapSize * (toTile + 1))) / toTile);
+		mh = (int)((monitor->height - barHeight - (settings->gapSize * (toTile + 1))) / toTile);
 		sw = 0;
 		sh = 0;
 	} else {
 		mw = (monitor->width * settings->masterRatio) - (int)(1.5 * settings->gapSize);
-		mh = (int)((monitor->height - (settings->gapSize * (settings->masterCount + 1))) / settings->masterCount);
+		mh = (int)((monitor->height - barHeight - (settings->gapSize * (settings->masterCount + 1))) / settings->masterCount);
 		sw = (monitor->width - (int)(1.5 * settings->gapSize) - mw);
-		sh = (int)((monitor->height - (settings->gapSize * (toTile - settings->masterCount + 1))) / (toTile - settings->masterCount));
+		sh = (int)((monitor->height - barHeight - (settings->gapSize * (toTile - settings->masterCount + 1))) / (toTile - settings->masterCount));
 	}
 
 	// Organise the windows
@@ -41,7 +42,7 @@ void tile() {
 		XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
 		XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
 		XMoveWindow(display, c->frame, i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize),
-		                               i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount));
+		                                barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)));
 		i++;
 	}
 }
