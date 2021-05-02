@@ -1,6 +1,7 @@
 #include "clientList.h"
 #include "tile.h"
 #include "util.h"
+#include "handlers.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -50,6 +51,18 @@ void keyPress(XEvent e) {
 		else XRaiseWindow(display, c->frame);
 		c->floating = c->floating ? false : true;
 		tile();
+		return;
+	}
+
+	// If the Mod+Shift+c combination was recieved, we should close some window
+	if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_c))) {
+		XGrabServer(display);
+		XSetErrorHandler(nothingHandler);
+		XSetCloseDownMode(display, DestroyAll);
+		XKillClient(display, c->window);
+		XSync(display, false);
+		XSetErrorHandler(errorHandler);
+		XUngrabServer(display);
 		return;
 	}
 }

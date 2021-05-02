@@ -18,7 +18,6 @@ void* settings = NULL; // The settings structure
 bool running;
 
 int detectWM(Display* display, XErrorEvent* e);
-int errorHandler(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
@@ -83,11 +82,6 @@ int main(int argc, char** argv) {
 
 	XCloseDisplay(display);
 
-	return 0;
-}
-
-// An error handler which does nothing.
-int errorHandler(Display* display, XErrorEvent* e) {
 	return 0;
 }
 

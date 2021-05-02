@@ -57,6 +57,7 @@ void mapRequest(XEvent e) {
 	XReparentWindow(display, e.xmaprequest.window, framed, 0, 0);
 	XMapWindow(display, framed);
 	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_c), Mod4Mask | ShiftMask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
 	XGrabButton(display, Button1, Mod4Mask, e.xmaprequest.window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XMapWindow(display, e.xmaprequest.window);
 
@@ -80,4 +81,12 @@ void unmapNotify(XEvent e) {
 
 	// Tile the windows
 	tile();
+}
+
+// An error handler which does nothing
+int nothingHandler(Display* display, XErrorEvent* e) { return 0; }
+
+// An error handler which does nothing.
+int errorHandler(Display* display, XErrorEvent* e) {
+	return 0;
 }
