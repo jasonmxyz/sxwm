@@ -72,6 +72,7 @@ void mapRequest(XEvent e) {
 	XReparentWindow(display, e.xmaprequest.window, framed, 0, 0);
 	XMapWindow(display, framed);
 	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
+	XGrabButton(display, Button1, Mod4Mask, e.xmaprequest.window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XMapWindow(display, e.xmaprequest.window);
 
 	// Tile the windows

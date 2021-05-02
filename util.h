@@ -7,3 +7,9 @@ void die_(int line, char* file, char* message);
 #define die(X) die_(X)
 void die_(char* message);
 #endif
+
+typedef struct Point Point;
+typedef Point Dimension;
+struct Point {
+	int x, y;
+};

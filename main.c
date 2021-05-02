@@ -64,6 +64,12 @@ int main(int argc, char** argv) {
 			case KeyPress:
 				keyPress(e);
 				break;
+			case ButtonPress:
+				buttonPress(e);
+				break;
+			case MotionNotify:
+				motionNotify(e);
+				break;
 			default:
 				#ifdef VERBOSE
 				printf("Ignored event\n");
