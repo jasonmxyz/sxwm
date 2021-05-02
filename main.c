@@ -3,7 +3,7 @@
 #include "handlers.h"
 #include "monitors.h"
 #include "tile.h"
-#include "keys.h"
+#include "input.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
