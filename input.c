@@ -3,6 +3,8 @@
 #include "util.h"
 
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/keysym.h>
@@ -15,11 +17,25 @@ Point mouseDownPos;
 Point initialFramedPos;
 Dimension initialFramedSize;
 
+char* stArgv[] = {"st", NULL};
+
 void keyPress(XEvent e) {
 	// If the input is on the root window
 	if (e.xkey.window == root) {
 		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_q))) {
 			running = false;
+			return;
+		}
+		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_Return))) {
+			// Start a new process by forking
+			if (fork() == 0) {
+				// Close the current connection to the display
+				//close(ConnectionNumber(display));
+				setsid();
+				execvp(stArgv[0], stArgv);
+				exit(0);
+			}
+			return;
 		}
 	}
 	
