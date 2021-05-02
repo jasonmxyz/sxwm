@@ -41,7 +41,7 @@ void tile() {
 		XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
 		XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
 		XMoveWindow(display, c->frame, i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize),
-		                               i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount)+1) + sh*(i-settings->masterCount));
+		                               i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount));
 		i++;
 	}
 }
