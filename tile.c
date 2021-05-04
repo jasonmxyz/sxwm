@@ -11,16 +11,18 @@ extern int clientCount;
 extern Display* display;
 extern int barHeight;
 extern int borderWidth;
+extern int currentTag;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = clients; c != NULL; c=c->next)
-		if (!(c->floating)) toTile++;
+		if (!(c->floating) && (c->tag == currentTag)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
-	if (toTile == 0) return;
+	//if (toTile == 0) return;
+	if (toTile == 0) toTile = 1;
 	
 	// Determine the dimensions for master and slave windows
 	int mw, mh, sw, sh;
@@ -39,11 +41,22 @@ void tile() {
 	// Organise the windows
 	int i = 0;
 	for (Client* c = clients; c != NULL; c=c->next) {
-		if (c->floating) continue;
-		XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
-		XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
-		XMoveWindow(display, c->frame, i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize),
-		                                barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)));
-		i++;
+		// Put tiled windows in the correct place
+		if (!(c->floating) && (c->tag == currentTag)) {
+			XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
+			XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
+			XMoveWindow(display, c->frame, i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize),
+			                                barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)));
+
+			i++;
+		} 
+		// Put floating windows back where they should be
+		else if (c->tag == currentTag) {
+			XMoveWindow(display, c->frame, (c->floatingLocation).x, (c->floatingLocation).y);
+		}
+		// Move other windows off the screen
+		else {
+			XMoveWindow(display, c->frame, monitor->width * -2, 0);
+		}
 	}
 }

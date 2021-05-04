@@ -12,6 +12,7 @@
 extern Display* display;
 extern Window root;
 extern bool running;
+extern int currentTag;
 
 Point mouseDownPos;
 Point initialFramedPos;
@@ -36,6 +37,28 @@ void keyPress(XEvent e) {
 				exit(0);
 			}
 			return;
+		}
+		if (e.xkey.state & Mod4Mask) {
+			if (e.xkey.keycode == XKeysymToKeycode(display, XK_1)) {
+					currentTag = 1;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_2)) {
+					currentTag = 2;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_3)) {
+					currentTag = 3;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_4)) {
+					currentTag = 4;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_5)) {
+					currentTag = 5;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_6)) {
+					currentTag = 6;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_7)) {
+					currentTag = 7;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_8)) {
+					currentTag = 8;
+			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_9)) {
+					currentTag = 9;
+			}
+			tile();
 		}
 	}
 	
@@ -101,6 +124,9 @@ void motionNotify(XEvent e) {
 		XResizeWindow(display, c->frame, initialFramedSize.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedSize.y - (mouseDownPos.y - e.xmotion.y_root));
 		XResizeWindow(display, c->window, initialFramedSize.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedSize.y - (mouseDownPos.y - e.xmotion.y_root));
 		if (!(c->floating)) {
+			// Preserve its floating location
+			(c->floatingLocation).x = initialFramedPos.x;
+			(c->floatingLocation).y = initialFramedPos.y;
 			c->floating = true;
 			tile();
 		}
@@ -109,6 +135,8 @@ void motionNotify(XEvent e) {
 	// If a window was dragged
 	if (e.xmotion.state & Button1Mask) {
 		XMoveWindow(display, c->frame, initialFramedPos.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root));
+		(c->floatingLocation).x = initialFramedPos.x - (mouseDownPos.x - e.xmotion.x_root);
+		(c->floatingLocation).y = initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root);
 		// Bring the window out of floating mode, and retile the screen if necessary
 		if (!(c->floating)) {
 			c->floating = true;

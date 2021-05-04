@@ -56,6 +56,15 @@ int main(int argc, char** argv) {
 
 	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_Return), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_1), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_2), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_3), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_4), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_5), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_6), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_7), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_8), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_9), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
 	running = true;
