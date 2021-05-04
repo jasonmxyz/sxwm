@@ -41,9 +41,7 @@ void mapRequest(XEvent e) {
 	// Check whether this is the bar
 	XClassHint wclass = {NULL, NULL};
 	XGetClassHint(display, e.xmaprequest.window, &wclass);
-	printf("%s  -  %s\n", wclass.res_name, wclass.res_class);
 	if (strcmp(wclass.res_name, "sxwm") == 0 && strcmp(wclass.res_class, "sxwm-bar") == 0) {
-		printf("this is the bar\n");
 		XMapWindow(display, e.xmaprequest.window);
 		return;
 	}
