@@ -13,6 +13,7 @@
 extern Display* display;
 extern Window root;
 extern int borderWidth;
+extern int currentTag;
 
 void configureRequest(XEvent e) {
 	// Can be recieved multiple times while an application is running, so best not to
@@ -62,6 +63,7 @@ void mapRequest(XEvent e) {
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;
+	newClient->tag = currentTag;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame

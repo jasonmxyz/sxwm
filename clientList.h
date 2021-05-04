@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 #include <X11/Xlib.h>
 #include <stdbool.h>
 
@@ -10,6 +12,8 @@ struct Client {
 	Client* next;
 	Client* previous;
 	bool floating;
+	int tag;
+	Point floatingLocation;
 };
 
 void addClient(Client* client);
