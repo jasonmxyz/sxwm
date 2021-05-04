@@ -20,6 +20,7 @@ bool running;
 
 int barHeight = 30;
 int borderWidth = 1;
+int currentTag = 1;
 
 int detectWM(Display* display, XErrorEvent* e);
 

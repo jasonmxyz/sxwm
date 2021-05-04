@@ -10,6 +10,7 @@ struct Client {
 	Client* next;
 	Client* previous;
 	bool floating;
+	int tag;
 };
 
 void addClient(Client* client);
