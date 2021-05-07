@@ -34,7 +34,7 @@ void tile() {
 	} else {
 		mw = (monitor->width * settings->masterRatio) - (int)(1.5 * settings->gapSize);
 		mh = (int)((monitor->height - barHeight - (settings->gapSize * (settings->masterCount + 1))) / settings->masterCount);
-		sw = (monitor->width - (int)(1.5 * settings->gapSize) - mw);
+		sw = (monitor->width * (1 - settings->masterRatio)) - (int)(1.5 * settings->gapSize);
 		sh = (int)((monitor->height - barHeight - (settings->gapSize * (toTile - settings->masterCount + 1))) / (toTile - settings->masterCount));
 	}
 
@@ -45,8 +45,8 @@ void tile() {
 		if (!(c->floating) && (c->tag == currentTag)) {
 			XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
 			XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
-			XMoveWindow(display, c->frame, i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize),
-			                                barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)));
+			XMoveWindow(display, c->frame, (i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize)) - borderWidth,
+			                                (barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)))) - borderWidth;
 
 			i++;
 		} 
