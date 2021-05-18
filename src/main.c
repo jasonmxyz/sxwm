@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
 	((tileSettings*)settings)->gapSize = 10;
 
 	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_p), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_Return), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_1), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_2), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);

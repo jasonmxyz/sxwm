@@ -19,6 +19,7 @@ Point initialFramedPos;
 Dimension initialFramedSize;
 
 char* stArgv[] = {"st", NULL};
+char* dmenuArgv[] = {"dmenu_run", NULL};
 
 void keyPress(XEvent e) {
 	// If the input is on the root window
@@ -27,11 +28,18 @@ void keyPress(XEvent e) {
 			running = false;
 			return;
 		}
+		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_p))) {
+			// Start dmenu
+			if (fork() == 0) {
+				setsid();
+				execvp(dmenuArgv[0], dmenuArgv);
+				exit(0);
+			}
+			return;
+		}
 		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_Return))) {
 			// Start a new process by forking
 			if (fork() == 0) {
-				// Close the current connection to the display
-				//close(ConnectionNumber(display));
 				setsid();
 				execvp(stArgv[0], stArgv);
 				exit(0);
