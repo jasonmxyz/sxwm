@@ -12,10 +12,13 @@ DEP := $(HEADERS) Makefile
 all: sxwm
 
 clean:
-	make -C src clean
+	rm -f sxwm $(OBJ)
 
-sxwm:
-	make -C src sxwm
+$(OBJ): %.o : %.c $(DEP)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+sxwm: % : $(OBJ)
+	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
 
 test: sxwm
-	xinit ./src/sxwm -- $$(which Xephyr) :1 -ac -br -screen 1280x720
+	xinit ./sxwm -- $$(which Xephyr) :1 -ac -br -screen 1280x720
