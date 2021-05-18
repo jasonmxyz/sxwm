@@ -52,6 +52,12 @@ void mapRequest(XEvent e) {
 	XWindowAttributes attrs;
 	XGetWindowAttributes(display, e.xmaprequest.window, &attrs);
 
+	// If the window has the override_redirect flag set, then do nothing
+	if (attrs.override_redirect) {
+		XMapWindow(display, e.xmaprequest.window);
+		return;
+	}
+
 	// Create this window with a border to surround e.xmaprequest.window and save it to
 	// the set of all windows for X
 	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, borderWidth, 0x3333ff, 0xffffff);
