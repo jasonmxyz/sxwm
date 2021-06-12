@@ -1,7 +1,5 @@
 #include "util.h"
 #include "clientList.h"
-#include "tile.h"
-#include "input.h"
 #include "settings.h"
 
 #include <stdio.h>
@@ -15,6 +13,43 @@ extern Display* display;
 extern Window root;
 extern int currentTag;
 extern Settings settings;
+
+extern void keyPress(XEvent e);
+extern void buttonPress(XEvent e);
+extern void motionNotify(XEvent e);
+
+void configureRequest(XEvent e);
+void mapRequest(XEvent e);
+void unmapNotify(XEvent e);
+int nothingHandler(Display* display, XErrorEvent* e);
+int errorHandler(Display* display, XErrorEvent* e);
+
+extern void tile();
+
+void handle(XEvent e) {
+	switch (e.type) {
+		case ConfigureRequest:
+			configureRequest(e);
+			break;
+		case MapRequest:
+			mapRequest(e);
+			break;
+		case UnmapNotify:
+			unmapNotify(e);
+			break;
+		case KeyPress:
+			keyPress(e);
+			break;
+		case ButtonPress:
+			buttonPress(e);
+			break;
+		case MotionNotify:
+			motionNotify(e);
+			break;
+		default:
+			break;
+	}
+}
 
 void configureRequest(XEvent e) {
 	// Can be recieved multiple times while an application is running, so best not to

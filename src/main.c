@@ -1,10 +1,6 @@
 #include "util.h"
 #include "clientList.h"
-#include "handlers.h"
 #include "monitors.h"
-#include "tile.h"
-#include "input.h"
-#include "bar.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -17,6 +13,10 @@ Display* display;      // The X display to connected to
 Window root;           // The root window of this display
 bool running;
 int currentTag = 1;
+
+extern void createBar();
+extern void handle(XEvent e);
+extern int errorHandler(Display* display, XErrorEvent* e);
 
 int detectWM(Display* display, XErrorEvent* e);
 
@@ -63,28 +63,7 @@ int main(int argc, char** argv) {
 		XEvent e;
 		XNextEvent(display, &e);
 		
-		switch (e.type) {
-			case ConfigureRequest:
-				configureRequest(e);
-				break;
-			case MapRequest:
-				mapRequest(e);
-				break;
-			case UnmapNotify:
-				unmapNotify(e);
-				break;
-			case KeyPress:
-				keyPress(e);
-				break;
-			case ButtonPress:
-				buttonPress(e);
-				break;
-			case MotionNotify:
-				motionNotify(e);
-				break;
-			default:
-				break;
-		}
+		handle(e);
 	}
 
 	XCloseDisplay(display);

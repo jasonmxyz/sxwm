@@ -1,7 +1,5 @@
 #include "clientList.h"
-#include "tile.h"
 #include "util.h"
-#include "handlers.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -13,6 +11,11 @@ extern Display* display;
 extern Window root;
 extern bool running;
 extern int currentTag;
+
+extern int errorHandler(Display* display, XErrorEvent* e);
+extern int nothingHandler(Display* display, XErrorEvent* e);
+
+extern void tile();
 
 Point mouseDownPos;
 Point initialFramedPos;
