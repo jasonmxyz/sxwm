@@ -6,35 +6,53 @@
 #include <string.h>
 #include <X11/Xutil.h>
 
-Window bar = (Window)NULL;
 extern int barHeight;
+
+Window bar;
+Display* d;
+int s, width;
+GC gc;
+
+void draw();
 
 void createBar() {
 	int result = fork();
 	if (result < 0) die("Could not create another thread");
 	if (result != 0) return;
 
-	Display* d = XOpenDisplay(NULL);
+	d = XOpenDisplay(NULL);
 	Window r = XDefaultRootWindow(d);
-	int s = DefaultScreen(d);
-	int width = DisplayWidth(d, s);
+	s = DefaultScreen(d);
+	width = DisplayWidth(d, s);
+
 	XClassHint wc = {"sxwm", "sxwm-bar"};
-	Window w = XCreateSimpleWindow(d, RootWindow(d,s), 0, 0, width, barHeight, 0, BlackPixel(d,s), WhitePixel(d,s));
-	XSelectInput(d, w, ExposureMask | KeyPressMask);
-	XSetClassHint(d, w, &wc);
-	XMapWindow(d,w);
+	bar = XCreateSimpleWindow(d, RootWindow(d, s), 0, 0, width, barHeight, 0, BlackPixel(d, s), WhitePixel(d, s));
+	XSelectInput(d, bar, ExposureMask | KeyPressMask);
+	XSetClassHint(d, bar, &wc);
+	XMapWindow(d, bar);
+
+	gc = XCreateGC(d, r, 0, NULL);
 
 	XEvent e;
-	const char *msg = "github.com/jasonmxyx/sxwm";
 	for (;;) {
 		XNextEvent(d, &e);
 		if (e.type == Expose) {
-			//XFillRectangle(d, w, DefaultGC(d, s), 20, 20, 10, 10);
-			XDrawString(d, w, DefaultGC(d, s), 10, 20, msg, strlen(msg));
+			printf("Drawing bar\n");
+			draw();
 		}
 	}
 
 	XCloseDisplay(d);
 
 	exit(0);
+}
+
+void draw() {
+	const char *msg = "github.com/jasonmxyx/sxwm";
+
+	XSetForeground(d, gc, 0x000000FF);
+	XFillRectangle(d, bar, gc, 0, 0, barHeight * 9, barHeight);
+
+	XSetForeground(d, gc, 0x00000000);
+	XDrawString(d, bar, gc, barHeight * 9 + 10, 20, msg, strlen(msg));
 }
