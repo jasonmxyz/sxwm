@@ -1,16 +1,17 @@
 #include "clientList.h"
 #include "tile.h"
 #include "monitors.h"
+#include "settings.h"
 
 #include <stdio.h>
 
-extern tileSettings* settings;
+extern TileSettings tileSettings;
+extern Settings settings;
+extern BarSettings barSettings;
 extern Monitor* monitor;
 extern Client* clients;
 extern int clientCount;
 extern Display* display;
-extern int barHeight;
-extern int borderWidth;
 extern int currentTag;
 
 // Aranges the windows on the screen into the tiling layout
@@ -26,16 +27,16 @@ void tile() {
 	
 	// Determine the dimensions for master and slave windows
 	int mw, mh, sw, sh;
-	if (settings->masterCount >= toTile) {
-		mw = monitor->width - (2 * settings->gapSize);
-		mh = (int)((monitor->height - barHeight - (settings->gapSize * (toTile + 1))) / toTile);
+	if (tileSettings.masterCount >= toTile) {
+		mw = monitor->width - (2 * tileSettings.gapSize);
+		mh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (toTile + 1))) / toTile);
 		sw = 0;
 		sh = 0;
 	} else {
-		mw = (monitor->width * settings->masterRatio) - (int)(1.5 * settings->gapSize);
-		mh = (int)((monitor->height - barHeight - (settings->gapSize * (settings->masterCount + 1))) / settings->masterCount);
-		sw = (monitor->width * (1 - settings->masterRatio)) - (int)(1.5 * settings->gapSize);
-		sh = (int)((monitor->height - barHeight - (settings->gapSize * (toTile - settings->masterCount + 1))) / (toTile - settings->masterCount));
+		mw = (monitor->width * tileSettings.masterRatio) - (int)(1.5 * tileSettings.gapSize);
+		mh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (tileSettings.masterCount + 1))) / tileSettings.masterCount);
+		sw = (monitor->width * (1 - tileSettings.masterRatio)) - (int)(1.5 * tileSettings.gapSize);
+		sh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (toTile - tileSettings.masterCount + 1))) / (toTile - tileSettings.masterCount));
 	}
 
 	// Organise the windows
@@ -43,10 +44,10 @@ void tile() {
 	for (Client* c = clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
 		if (!(c->floating) && (c->tag == currentTag)) {
-			XResizeWindow(display, c->frame, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
-			XResizeWindow(display, c->window, i < settings->masterCount ? mw : sw, i < settings->masterCount ? mh : sh);
-			XMoveWindow(display, c->frame, (i < settings->masterCount ? settings->gapSize : mw + (2 * settings->gapSize)) - borderWidth,
-			                                (barHeight + (i < settings->masterCount ? (settings->gapSize * (i+1)) + mh*i : (settings->gapSize * (i-settings->masterCount+1)) + sh*(i-settings->masterCount)))) - borderWidth;
+			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
+			XResizeWindow(display, c->window, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
+			XMoveWindow(display, c->frame, (i < tileSettings.masterCount ? tileSettings.gapSize : mw + (2 * tileSettings.gapSize)) - settings.borderWidth,
+			                                (barSettings.height + (i < tileSettings.masterCount ? (tileSettings.gapSize * (i+1)) + mh*i : (tileSettings.gapSize * (i-tileSettings.masterCount+1)) + sh*(i-tileSettings.masterCount)))) - settings.borderWidth;
 
 			i++;
 		} 

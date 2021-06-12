@@ -2,6 +2,7 @@
 #include "clientList.h"
 #include "tile.h"
 #include "input.h"
+#include "settings.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -12,8 +13,8 @@
 
 extern Display* display;
 extern Window root;
-extern int borderWidth;
 extern int currentTag;
+extern Settings settings;
 
 void configureRequest(XEvent e) {
 	// Can be recieved multiple times while an application is running, so best not to
@@ -60,7 +61,7 @@ void mapRequest(XEvent e) {
 
 	// Create this window with a border to surround e.xmaprequest.window and save it to
 	// the set of all windows for X
-	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, borderWidth, 0x3333ff, 0xffffff);
+	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, settings.borderWidth, settings.borderColor, 0xffffff);
 	XSelectInput(display, framed, SubstructureRedirectMask | SubstructureNotifyMask);
 	XAddToSaveSet(display, e.xmaprequest.window);
 

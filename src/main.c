@@ -15,11 +15,7 @@
 char** g_argv;         // Copy of argv to use in other functions
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
-void* settings = NULL; // The settings structure
 bool running;
-
-int barHeight = 30;
-int borderWidth = 1;
 int currentTag = 1;
 
 int detectWM(Display* display, XErrorEvent* e);
@@ -47,12 +43,6 @@ int main(int argc, char** argv) {
 
 	// Populate the screen structure with the geometry of the display
 	getMonitors();
-
-	// Create the settings structure with the default settings
-	settings = malloc(sizeof(tileSettings));
-	((tileSettings*)settings)->masterCount = 1;
-	((tileSettings*)settings)->masterRatio = 0.6;
-	((tileSettings*)settings)->gapSize = 10;
 
 	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_p), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);

@@ -1,12 +1,14 @@
 #include "util.h"
+#include "settings.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <X11/Xlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <X11/Xutil.h>
 
-extern int barHeight;
+extern BarSettings barSettings;
 
 Window bar;
 Display* d;
@@ -26,7 +28,7 @@ void createBar() {
 	width = DisplayWidth(d, s);
 
 	XClassHint wc = {"sxwm", "sxwm-bar"};
-	bar = XCreateSimpleWindow(d, RootWindow(d, s), 0, 0, width, barHeight, 0, BlackPixel(d, s), WhitePixel(d, s));
+	bar = XCreateSimpleWindow(d, RootWindow(d, s), 0, 0, width, barSettings.height, 0, barSettings.bgColor1, barSettings.bgColor1);
 	XSelectInput(d, bar, ExposureMask | KeyPressMask);
 	XSetClassHint(d, bar, &wc);
 	XMapWindow(d, bar);
@@ -50,9 +52,9 @@ void createBar() {
 void draw() {
 	const char *msg = "github.com/jasonmxyx/sxwm";
 
-	XSetForeground(d, gc, 0x000000FF);
-	XFillRectangle(d, bar, gc, 0, 0, barHeight * 9, barHeight);
+	XSetForeground(d, gc, barSettings.bgColor2);
+	XFillRectangle(d, bar, gc, 0, 0, barSettings.height * 9, barSettings.height);
 
-	XSetForeground(d, gc, 0x00000000);
-	XDrawString(d, bar, gc, barHeight * 9 + 10, 20, msg, strlen(msg));
+	XSetForeground(d, gc, barSettings.fgColor1);
+	XDrawString(d, bar, gc, barSettings.height * 9 + 10, 20, msg, strlen(msg));
 }
