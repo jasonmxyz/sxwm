@@ -7,14 +7,17 @@
 #include <unistd.h>
 #include <string.h>
 #include <X11/Xutil.h>
+#include <sys/shm.h>
 
 extern BarSettings barSettings;
+
+extern int sid;
+extern Shared* shared;
 
 Window bar;
 Display* d;
 int s, width;
 GC gc;
-extern currentTag;
 
 void draw();
 void drawTags();
@@ -48,6 +51,10 @@ void createBar() {
 
 	XCloseDisplay(d);
 
+	// Detach from and remove the shared memory segment.
+	shmdt(shared);
+    shmctl(sid, IPC_RMID, 0);
+
 	exit(0);
 }
 
@@ -71,7 +78,7 @@ void drawTags() {
 	// Draw each of the tag numbers, and indicate the currently selected tag with another color.
 	for (int i = 1; i <= 9; i++, tag[0]++) {
 		// If this tag is slected, then draw another coloured rectangle
-		if (i == currentTag) {
+		if (i == shared->currentTag) {
 			XSetForeground(d, gc, barSettings.bgColor1);
 			XFillRectangle(d, bar, gc, barSettings.height * (i-1), 0, barSettings.height, barSettings.height);
 			XSetForeground(d, gc, barSettings.fgColor1);

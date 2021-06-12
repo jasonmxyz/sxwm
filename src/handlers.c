@@ -11,7 +11,7 @@
 
 extern Display* display;
 extern Window root;
-extern int currentTag;
+extern Shared* shared;
 extern Settings settings;
 
 extern void keyPress(XEvent e);
@@ -105,7 +105,7 @@ void mapRequest(XEvent e) {
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;
-	newClient->tag = currentTag;
+	newClient->tag = shared->currentTag;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame

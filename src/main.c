@@ -7,12 +7,16 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
 
 char** g_argv;         // Copy of argv to use in other functions
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
 bool running;
-int currentTag = 1;
+
+Shared* shared; // A shared memory segment
+int sid; // The id of the segment
 
 extern void createBar();
 extern void handle(XEvent e);
@@ -22,6 +26,12 @@ int detectWM(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
+
+	// Create the shared memory segment with read and write permissions on a new private segment.
+	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+	shared = shmat(sid, NULL, 0);
+
+	shared->currentTag = 1;
 	
 	createBar();
 
@@ -67,6 +77,10 @@ int main(int argc, char** argv) {
 	}
 
 	XCloseDisplay(display);
+
+	// Detatch from and destroy the shared memory segment
+	shmdt(shared);
+    shmctl(sid, IPC_RMID, 0);
 
 	return 0;
 }

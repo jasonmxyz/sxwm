@@ -13,3 +13,8 @@ typedef Point Dimension;
 struct Point {
 	int x, y;
 };
+
+typedef struct Shared Shared;
+struct Shared {
+	int currentTag;
+};

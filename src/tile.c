@@ -11,14 +11,14 @@ extern Monitor* monitor;
 extern Client* clients;
 extern int clientCount;
 extern Display* display;
-extern int currentTag;
+extern Shared* shared;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = clients; c != NULL; c=c->next)
-		if (!(c->floating) && (c->tag == currentTag)) toTile++;
+		if (!(c->floating) && (c->tag == shared->currentTag)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
 	//if (toTile == 0) return;
@@ -42,7 +42,7 @@ void tile() {
 	int i = 0;
 	for (Client* c = clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
-		if (!(c->floating) && (c->tag == currentTag)) {
+		if (!(c->floating) && (c->tag == shared->currentTag)) {
 			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
 			XResizeWindow(display, c->window, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
 			XMoveWindow(display, c->frame, (i < tileSettings.masterCount ? tileSettings.gapSize : mw + (2 * tileSettings.gapSize)) - settings.borderWidth,
@@ -51,7 +51,7 @@ void tile() {
 			i++;
 		} 
 		// Put floating windows back where they should be
-		else if (c->tag == currentTag) {
+		else if (c->tag == shared->currentTag) {
 			XMoveWindow(display, c->frame, (c->floatingLocation).x, (c->floatingLocation).y);
 		}
 		// Move other windows off the screen

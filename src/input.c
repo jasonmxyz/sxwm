@@ -10,7 +10,7 @@
 extern Display* display;
 extern Window root;
 extern bool running;
-extern int currentTag;
+extern Shared* shared;
 
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
@@ -51,23 +51,23 @@ void keyPress(XEvent e) {
 		}
 		if (e.xkey.state & Mod4Mask) {
 			if (e.xkey.keycode == XKeysymToKeycode(display, XK_1)) {
-					currentTag = 1;
+					shared->currentTag = 1;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_2)) {
-					currentTag = 2;
+					shared->currentTag = 2;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_3)) {
-					currentTag = 3;
+					shared->currentTag = 3;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_4)) {
-					currentTag = 4;
+					shared->currentTag = 4;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_5)) {
-					currentTag = 5;
+					shared->currentTag = 5;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_6)) {
-					currentTag = 6;
+					shared->currentTag = 6;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_7)) {
-					currentTag = 7;
+					shared->currentTag = 7;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_8)) {
-					currentTag = 8;
+					shared->currentTag = 8;
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_9)) {
-					currentTag = 9;
+					shared->currentTag = 9;
 			}
 			tile();
 		}
