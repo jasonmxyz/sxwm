@@ -69,6 +69,12 @@ void keyPress(XEvent e) {
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_9)) {
 					shared->currentTag = 9;
 			}
+			// Send an expose message to the bar window if it exists
+			if (shared->bar != (Window)NULL) {
+				XEvent event;
+				event.type = Expose;
+				XSendEvent(display, shared->bar, true, NoEventMask, &event);
+			}
 			tile();
 		}
 	}

@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
 	shared = shmat(sid, NULL, 0);
 
 	shared->currentTag = 1;
+	shared->bar = (Window)NULL;
 	
 	createBar();
 

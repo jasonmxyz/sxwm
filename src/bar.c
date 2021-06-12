@@ -34,6 +34,7 @@ void createBar() {
 
 	XClassHint wc = {"sxwm", "sxwm-bar"};
 	bar = XCreateSimpleWindow(d, RootWindow(d, s), 0, 0, width, barSettings.height, 0, barSettings.bgColor1, barSettings.bgColor1);
+	shared->bar = bar;
 	XSelectInput(d, bar, ExposureMask | KeyPressMask);
 	XSetClassHint(d, bar, &wc);
 	XMapWindow(d, bar);

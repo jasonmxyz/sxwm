@@ -1,5 +1,7 @@
 #pragma once
 
+#include <X11/Xlib.h>
+
 #ifdef VERBOSE
 #define die(X) die_(__LINE__, __FILE__, X)
 void die_(int line, char* file, char* message);
@@ -17,4 +19,5 @@ struct Point {
 typedef struct Shared Shared;
 struct Shared {
 	int currentTag;
+	Window bar;
 };
