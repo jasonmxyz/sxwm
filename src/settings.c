@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <X11/Xlib.h>
 
 // Default settings
 BarSettings barSettings = {
@@ -29,7 +30,19 @@ TileSettings tileSettings = {
 KeyCombo* rootKeyCombos = NULL;
 KeyCombo* clientKeyCombos = NULL;
 
+// Arrays of bindable functions
+extern void selectTag(int t);
+extern void stop();
+fDict rootFunctions[2] = {{"selectTag", selectTag, FDICT_NEEDINT},
+						  {"exit", stop, 0}};
+fDict clientFunctions[0] = {};
+
+#define RF_COUNT 2 // How many elements there are in the above arrays
+#define CF_COUNT 0
+
 void keybind(char* line, int start, int lineSize);
+
+extern Display* display;
 
 // Read a configuration from a given file
 void readSettings(char* path) {
@@ -44,7 +57,6 @@ void readSettings(char* path) {
 	char* line = calloc(lineSize, 1);
 
 	if (line == NULL) {
-		fclose(f);
 		die("Could not allocate memory.");
 	}
 
@@ -56,7 +68,6 @@ void readSettings(char* path) {
 			// Expand the line buffer
 			line = realloc(line, lineSize + 256);
 			if (line == NULL) {
-				fclose(f);
 				die("Could not allocate memory.");
 			}
 			// Fill the new part of the buffer with zeros.
@@ -78,21 +89,17 @@ void readSettings(char* path) {
 
 		// Find how many characters are in the first word of this line
 		int l = 0;
-		while (line[p+l] != ' ' && line[p+l] != '\t' && line[p+l] != 0) l++;
+		while (line[p+l] != ' ' && line[p+l] != '\t' && line[p+l] != '\n' && line[p+l] != 0) l++;
 
 		// Compare to find the appropriate command and call that function
 		switch (l) {
 			case 4:
 				if (memcmp(line + p, "bind", 4) == 0) keybind(line, p, lineSize);
 				else {
-					fclose(f);
-					free(line);
 					die("Command not recognised.");
 				}
 				break;
 			default: {
-				fclose(f);
-				free(line);
 				die("Command not recgnised.");
 			}
 		}
@@ -104,11 +111,181 @@ void readSettings(char* path) {
 	// Clean up
 	free(line);
 	fclose(f);
-
-	die("a");
 }
 
 // Save a keybinding to the relevant data structure
 void keybind(char* line, int start, int lineSize) {
-	printf("%s", line + start);
+	// Find the position in the string where the key combination is written
+	// Find the first whitespace after the first word, then find the first non-whitespace
+	// If we ever find a newline or null byte, then we die.
+	int pk = start;
+	while (line[pk] != ' ' && line[pk] != '\t' && line[pk] != '\n' && line[pk] != 0) pk++;
+	if (line[pk] == 0 || line[pk] == '\n') dief("Too few arguments.\n> %s", line+start);
+	while (line[pk] == ' ' || line[pk] == '\t') pk++;
+	if (line[pk] == 0 || line[pk] == '\n') dief("Too few arguments.\n> %s", line+start);
+
+	// Do the same again to find the name of the function
+	int pf = pk;
+	while (line[pf] != ' ' && line[pf] != '\t' && line[pf] != '\n' && line[pf] != 0) pf++;
+	if (line[pf] == 0 || line[pf] == '\n') dief("Too few arguments.\n> %s", line+start);
+	while (line[pf] == ' ' || line[pf] == '\t') pf++;
+	if (line[pf] == 0 || line[pf] == '\n') dief("Too few arguments.\n> %s", line+start);
+
+	// Find the length of the name of the function
+	int lf = 0;
+	while (line[pf+lf] != ' ' && line[pf+lf] != '\t' && line[pf+lf] != '\n' && line[pf+lf] != 0) lf++;
+
+	// Temporarily set a null byte after the function name so that we can use strcmp
+	char borrowed = line[pf+lf];
+	line[pf+lf] = 0;
+
+	// Search the arrays to find a matching function
+	// Choose which linked list we will need to add this too.
+	fDict f = {NULL, NULL, 0};
+	KeyCombo** comboList;
+	for (int i = 0; i < RF_COUNT; i++)
+		if (strcmp(line + pf, rootFunctions[i].name) == 0) {
+			f = rootFunctions[i];
+			comboList = &rootKeyCombos;
+			break;
+		}
+	if (f.name == NULL) for (int i = 0; i < CF_COUNT; i++)
+		if (strcmp(line + pf, clientFunctions[i].name) == 0) {
+			f = clientFunctions[i];
+			comboList = &clientKeyCombos;
+			break;
+		}
+	
+	// If no function was found, then die
+	if (f.name == NULL) dief("Invalid function name \"%s\".", line + pf);
+	// Restore the character after the function name
+	line[pf+lf] = borrowed;
+
+	// Determine the key combination
+	unsigned int mask = 0;
+	int keycode = 0;
+
+	int ppk = pk; // Preserve for dief
+	int p = pk;
+	do {
+		p++;
+		// If we are looking at a whitespace or a +, then work with the last part
+		if (line[p] == '+' || line[p] == ' ' || line[p] == '\t') {
+			// Determine the number of characters in this token
+			char b = 0;
+			switch(p-pk) {
+				case 5:
+					// This could be 'space' or 'shift'
+					if (memcmp(line + pk, "shift", 5) == 0) {
+						mask |= ShiftMask;
+						break;
+					}
+					if (memcmp(line + pk, "space", 5) != 0) {
+						// Place a null byte for the convenience of dief
+						line[p] = 0;
+						dief("Unknown mask \"%s\".", line + pk);
+					}
+					// We can replace the character at line[pk] sneakily with a space and reuse the
+					// code below.
+					b = line[pk];
+					line[pk] = ' ';
+				case 1: {
+					// If there is only one character, then this is a letter/symbol
+					// There can only be one in a key-combination, die if keycode is already set
+					if (keycode != 0) die("Only one symbol allowed in a key combination.");
+
+					// Get the Keysym from the character.
+					char keystring[2] = {line[pk], 0};
+					KeySym ks = XStringToKeysym(keystring);
+					keycode = (int)XKeysymToKeycode(display, ks);
+					// If XKeysymToKeycode fails, it will return NoSymbol.
+					if (keycode == NoSymbol) dief("No symbol matched to \'%c\'.", line[pk]);
+
+					// If we had a space, then we must replace the character we swapped out
+					if (b != 0) line[pk] = b;
+					break;
+				}
+				case 3: {
+					// This could be 'win' or 'alt'
+					if (memcmp(line + pk, "win", 3) == 0) mask |= Mod4Mask;
+					else if (memcmp(line + pk, "alt", 3) == 0) mask |= Mod1Mask;
+					else {
+						line[p] = 0;
+						dief("Unknown mask \"%s\".", line + pk);
+					}
+					break;
+				}
+				case 4: {
+					// This could be 'ctrl'
+					if (memcmp(line + pk, "ctrl", 4) == 0) mask |= ControlMask;
+					else {
+						line[p] = 0;
+						dief("Unknown mask \"%s\".", line + pk);
+					}
+					break;
+				}
+				default:
+					// If the key doesn't match, then die
+					line[p] = 0;
+					dief("Unknown mask \"%s\".", line + pk);
+			}
+
+			// Reset pk and p to look at the next key/mask
+			// If we are on a plus, then there must be another thing to look at
+			if (line[p] == '+') pk = ++p;
+			else break;
+		}
+	} while (line[p] != ' ' && line[p] != '\t');
+
+	// If keycode was not set, then die
+	if (keycode == 0) {
+		line[p] = 0;
+		dief("Invalid key combination \"%s\"\n At least one printable charater is needed.", line+ppk);
+	}
+
+	// Determine whether there is an argument given
+	int pa = pf + lf;
+	bool hasArg = true;
+	while (line[pa] == ' ' || line[pa] == '\t') pa++;
+	if (line[pa] == '\n' || line[pa] == 0) hasArg = false;
+
+	if (f.needArg == 0 && hasArg) dief("No argument required for function \"%s\"\n> %s", f.name, line);
+	if (f.needArg != 0 && !hasArg) dief("Argument required for function \"%s\"\n> %s", f.name, line);
+
+	void* argument = NULL;
+
+	// If an argument is needed, then extract it
+	if (f.needArg == FDICT_NEEDINT) {
+		// Check that only integers are in the argument
+		int la = 0;
+		while (line[pa+la] >= '0' && line[pa+la] <= '9') la++;
+		if (line[pa+la] != 0 && line[pa+la] != '\n') {
+			line[pa+la] = 0;
+			dief("The argument given \"\" is not an integer.", line + pa);
+		}
+		line[pa+la] = 0;
+		#pragma GCC diagnostic ignored "-Wint-to-pointer-cast" // This is dodgy
+		argument = (void*)atoi(line + pa);
+		#pragma GCC diagnostic pop
+		
+	} else if (f.needArg == FDICT_NEEDSTRING) {
+		die("nyi");
+	}
+
+	// Create the structure
+	KeyCombo* newCombo = calloc(sizeof(KeyCombo), 1);
+	newCombo->modifiers = mask;
+	newCombo->keycode = keycode;
+	newCombo->function = f.function;
+	newCombo->arg = argument;
+
+	// Add the structure to the linked list
+	if (*comboList == NULL) {
+		*comboList = newCombo;
+		return;
+	}
+
+	KeyCombo* list = *comboList;
+	while (list->next != NULL) list = list->next;
+	list->next = newCombo;
 }

@@ -10,3 +10,6 @@ bind   win+6   selectTag 6
 bind   win+7   selectTag 7
 bind   win+8   selectTag 8
 bind   win+9   selectTag 9
+
+bind	win+shift+q		exit
+

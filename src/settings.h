@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct BarSettings BarSettings;
 struct BarSettings {
 	int height;
@@ -30,3 +32,13 @@ struct KeyCombo {
 	void* arg;
 	KeyCombo* next;
 };
+
+typedef struct fDict fDict;
+struct fDict {
+	char* name;
+	void* function;
+	int needArg;
+};
+
+#define FDICT_NEEDINT 1
+#define FDICT_NEEDSTRING 2
