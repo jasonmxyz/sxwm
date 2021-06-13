@@ -1,0 +1,12 @@
+# Default sxwm configuration
+
+# Keybindings
+bind   win+1   selectTag 1
+bind   win+2   selectTag 2
+bind   win+3   selectTag 3
+bind   win+4   selectTag 4
+bind   win+5   selectTag 5
+bind   win+6   selectTag 6
+bind   win+7   selectTag 7
+bind   win+8   selectTag 8
+bind   win+9   selectTag 9

@@ -21,3 +21,12 @@ struct TileSettings {
 	int masterCount;
 	int gapSize;
 };
+
+typedef struct KeyCombo KeyCombo;
+struct KeyCombo {
+	unsigned int modifiers;
+	int keycode;
+	void* function;
+	void* arg;
+	KeyCombo* next;
+};

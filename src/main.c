@@ -21,11 +21,18 @@ int sid; // The id of the segment
 extern void createBar();
 extern void handle(XEvent e);
 extern int errorHandler(Display* display, XErrorEvent* e);
+extern void readSettings(char* path);
 
 int detectWM(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
+
+	// Quick and dirty for now. Check that there is an argument, and pass that to readSettings
+	if (argc != 2) die("Incorrect number of arguments.");
+
+	// Load the settings into the relevant data structures
+	readSettings(argv[1]);
 
 	// Create the shared memory segment with read and write permissions on a new private segment.
 	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
