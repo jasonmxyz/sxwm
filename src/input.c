@@ -16,6 +16,7 @@ extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
 
 extern void tile();
+extern void selectTag(int t);
 
 Point mouseDownPos;
 Point initialFramedPos;
@@ -51,31 +52,24 @@ void keyPress(XEvent e) {
 		}
 		if (e.xkey.state & Mod4Mask) {
 			if (e.xkey.keycode == XKeysymToKeycode(display, XK_1)) {
-					shared->currentTag = 1;
+					selectTag(1);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_2)) {
-					shared->currentTag = 2;
+					selectTag(2);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_3)) {
-					shared->currentTag = 3;
+					selectTag(3);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_4)) {
-					shared->currentTag = 4;
+					selectTag(4);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_5)) {
-					shared->currentTag = 5;
+					selectTag(5);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_6)) {
-					shared->currentTag = 6;
+					selectTag(6);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_7)) {
-					shared->currentTag = 7;
+					selectTag(7);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_8)) {
-					shared->currentTag = 8;
+					selectTag(8);
 			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_9)) {
-					shared->currentTag = 9;
+					selectTag(9);
 			}
-			// Send an expose message to the bar window if it exists
-			if (shared->bar != (Window)NULL) {
-				XEvent event;
-				event.type = Expose;
-				XSendEvent(display, shared->bar, true, NoEventMask, &event);
-			}
-			tile();
 		}
 	}
 	
