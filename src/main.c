@@ -27,6 +27,11 @@ int detectWM(Display* display, XErrorEvent* e);
 int main(int argc, char** argv) {
 	g_argv = argv; // Preserve argv.
 
+	// Attempt to open the default display.
+	display = XOpenDisplay(NULL);
+	if (display == NULL)
+		die("Could not connect to X display.");
+
 	// Quick and dirty for now. Check that there is an argument, and pass that to readSettings
 	if (argc != 2) die("Incorrect number of arguments.");
 
@@ -42,11 +47,6 @@ int main(int argc, char** argv) {
 	shared->running = true;
 	
 	createBar();
-
-	// Attempt to open the default display.
-	display = XOpenDisplay(NULL);
-	if (display == NULL)
-		die("Could not connect to X display.");
 
 	root = XDefaultRootWindow(display);
 
