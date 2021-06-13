@@ -45,8 +45,6 @@ int main(int argc, char** argv) {
 	shared->currentTag = 1;
 	shared->bar = (Window)NULL;
 	shared->running = true;
-	
-	createBar();
 
 	root = XDefaultRootWindow(display);
 
@@ -61,6 +59,8 @@ int main(int argc, char** argv) {
 
 	// Populate the screen structure with the geometry of the display
 	getMonitors();
+
+	createBar();
 
 	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
 	XGrabKey(display, XKeysymToKeycode(display, XK_p), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
