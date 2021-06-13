@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 // Default settings
 BarSettings barSettings = {
@@ -175,9 +176,16 @@ void keybind(char* line, int start, int lineSize) {
 			char b = 0;
 			switch(p-pk) {
 				case 5:
-					// This could be 'space' or 'shift'
+					// This could be 'space' or 'shift' or 'enter'
 					if (memcmp(line + pk, "shift", 5) == 0) {
 						mask |= ShiftMask;
+						break;
+					}
+					// If enter, then just call with the XK_Retern value
+					if (memcmp(line + pk, "enter", 5) == 0) {
+						if (keycode != 0) die("Only one symbol allowed in a key combination.");
+						keycode = (int)XKeysymToKeycode(display, XK_Return);
+						if (keycode == NoSymbol) die("No symbol matched to \'enter\'.");
 						break;
 					}
 					if (memcmp(line + pk, "space", 5) != 0) {

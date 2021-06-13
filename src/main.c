@@ -1,6 +1,7 @@
 #include "util.h"
 #include "clientList.h"
 #include "monitors.h"
+#include "settings.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -16,6 +17,7 @@ Window root;           // The root window of this display
 
 Shared* shared; // A shared memory segment
 int sid; // The id of the segment
+extern KeyCombo* rootKeyCombos;
 
 extern void createBar();
 extern void handle(XEvent e);
@@ -62,18 +64,9 @@ int main(int argc, char** argv) {
 
 	createBar();
 
-	XGrabKey(display, XKeysymToKeycode(display, XK_q), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_p), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_Return), Mod4Mask | ShiftMask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_1), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_2), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_3), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_4), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_5), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_6), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_7), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_8), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_9), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
+	// Grab all the requested keys on the root window
+	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
+		XGrabKey(display, front->keycode, front->modifiers, root, true, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
 	while (shared->running) {
