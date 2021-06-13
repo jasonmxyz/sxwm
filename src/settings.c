@@ -271,8 +271,9 @@ void keybind(char* line, int start, int lineSize) {
 		while (line[pa+la] >= '0' && line[pa+la] <= '9') la++;
 		// If it was a non-whitespace character which stopped this number
 		if (line[pa+la] != 0 && line[pa+la] != '\n' && line[pa+la] != ' ') {
+			while (line[la+pa] != 0 && line[la+pa] != ' ' && line[la+pa] != '\n' && line[la+pa] != '\t') la++;
 			line[pa+la] = 0;
-			dief("The argument given \"\" is not an integer.", line + pa);
+			dief("The argument given \"%s\" is not an integer.", line + pa);
 		}
 		line[pa+la] = 0;
 		#pragma GCC diagnostic ignored "-Wint-to-pointer-cast" // This is dodgy
