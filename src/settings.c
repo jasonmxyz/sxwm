@@ -44,6 +44,7 @@ fDict clientFunctions[0] = {};
 #define CF_COUNT 0
 
 void keybind(char* line, int start, int lineSize);
+void doStmt(char* line, int start);
 
 extern Display* display;
 
@@ -96,11 +97,13 @@ void readSettings(char* path) {
 
 		// Compare to find the appropriate command and call that function
 		switch (l) {
+			case 3:
+				if (memcmp(line + p, "run", 3) == 0) doStmt(line, p);
+				else die("Command not recognised.");
+				break;
 			case 4:
 				if (memcmp(line + p, "bind", 4) == 0) keybind(line, p, lineSize);
-				else {
-					die("Command not recognised.");
-				}
+				else die("Command not recognised.");
 				break;
 			default: {
 				die("Command not recgnised.");
@@ -114,6 +117,20 @@ void readSettings(char* path) {
 	// Clean up
 	free(line);
 	fclose(f);
+}
+
+// Run a command
+void doStmt(char* line, int start) {
+	// Move along to find the start of the command at the first non-whitespace character
+	int p = start; // The start of the word 'run'
+	while (line[p] != 0 && line[p] != ' ' && line[p] != '\n' && line[p] != '\t') p++;
+	while (line[p] == ' ' || line[p] == '\t') p++;
+
+	// If we reached the end of the line, then this line is invalid
+	if (line[p] == 0 || line[p] == '\n') dief("No command specified.\n> %s", line+start);
+
+	// Run the command in a new thread with runCmd
+	runCmd(line+p);
 }
 
 // Save a keybinding to the relevant data structure
