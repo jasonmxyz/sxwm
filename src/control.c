@@ -30,3 +30,8 @@ void selectTag(int t) {
 	// Retile the window
 	tile();
 }
+
+// Stops sxwm
+void stop() {
+	shared->running = false;
+}

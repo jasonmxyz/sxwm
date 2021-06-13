@@ -1,6 +1,7 @@
 #pragma once
 
 #include <X11/Xlib.h>
+#include <stdbool.h>
 
 #ifdef VERBOSE
 #define die(X) die_(__LINE__, __FILE__, X)
@@ -20,4 +21,5 @@ typedef struct Shared Shared;
 struct Shared {
 	int currentTag;
 	Window bar;
+	bool running;
 };

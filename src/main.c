@@ -13,7 +13,6 @@
 char** g_argv;         // Copy of argv to use in other functions
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
-bool running;
 
 Shared* shared; // A shared memory segment
 int sid; // The id of the segment
@@ -40,6 +39,7 @@ int main(int argc, char** argv) {
 
 	shared->currentTag = 1;
 	shared->bar = (Window)NULL;
+	shared->running = true;
 	
 	createBar();
 
@@ -76,8 +76,7 @@ int main(int argc, char** argv) {
 	XGrabKey(display, XKeysymToKeycode(display, XK_9), Mod4Mask, root, true, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
-	running = true;
-	while (running) {
+	while (shared->running) {
 		XEvent e;
 		XNextEvent(display, &e);
 		

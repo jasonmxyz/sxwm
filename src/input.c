@@ -16,7 +16,9 @@ extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
 
 extern void tile();
+
 extern void selectTag(int t);
+extern void stop();
 
 Point mouseDownPos;
 Point initialFramedPos;
@@ -29,7 +31,7 @@ void keyPress(XEvent e) {
 	// If the input is on the root window
 	if (e.xkey.window == root) {
 		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_q))) {
-			running = false;
+			stop();
 			return;
 		}
 		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_p))) {
