@@ -45,7 +45,6 @@ void createBar() {
 	for (;;) {
 		XNextEvent(d, &e);
 		if (e.type == Expose) {
-			printf("Drawing bar\n");
 			draw();
 		}
 	}

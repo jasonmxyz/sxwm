@@ -42,14 +42,13 @@ void stop() {
 
 // Run a command in a new thread
 void runCmd(char* command) {
-	printf("going to run %s\n", command);
 	int used = 0;
 	int size = 10;
 	char** cmd;
 	bool inQuotes = false;
 	int argStart = 0;
 
-	cmd = calloc(10, 1);
+	cmd = calloc(10, sizeof(char*));
 
 	// Look at every character in the string i.e. until we see 0
 	for (int p = 0;; p++) {
@@ -94,13 +93,13 @@ void runCmd(char* command) {
 
 	cmd[used] = NULL;
 
-	printf("size: %d, used: %d\n", size, used);
-	for (int i = 0; i < used; i++) printf("--%s--\n", cmd[i]);
-
 	// Now we can fork and execute the program
 	if (fork() == 0) {
 		setsid();
 		execvp(cmd[0], cmd);
+		// Free memory
+		for (int i = 0; i < used-1; i++) if (cmd[i] != NULL) free(cmd[i]);
+		free(cmd);
 		exit(0);
 	}
 
