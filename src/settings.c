@@ -34,11 +34,13 @@ KeyCombo* clientKeyCombos = NULL;
 // Arrays of bindable functions
 extern void selectTag(int t);
 extern void stop();
-fDict rootFunctions[2] = {{"selectTag", selectTag, FDICT_NEEDINT},
-						  {"exit", stop, 0}};
+extern void runCmd(char* command);
+fDict rootFunctions[3] = {{"selectTag", selectTag, FDICT_NEEDINT},
+						  {"exit", stop, 0},
+						  {"run", runCmd, FDICT_NEEDSTRING}};
 fDict clientFunctions[0] = {};
 
-#define RF_COUNT 2 // How many elements there are in the above arrays
+#define RF_COUNT 3 // How many elements there are in the above arrays
 #define CF_COUNT 0
 
 void keybind(char* line, int start, int lineSize);
@@ -267,7 +269,8 @@ void keybind(char* line, int start, int lineSize) {
 		// Check that only integers are in the argument
 		int la = 0;
 		while (line[pa+la] >= '0' && line[pa+la] <= '9') la++;
-		if (line[pa+la] != 0 && line[pa+la] != '\n') {
+		// If it was a non-whitespace character which stopped this number
+		if (line[pa+la] != 0 && line[pa+la] != '\n' && line[pa+la] != ' ') {
 			line[pa+la] = 0;
 			dief("The argument given \"\" is not an integer.", line + pa);
 		}
@@ -277,7 +280,14 @@ void keybind(char* line, int start, int lineSize) {
 		#pragma GCC diagnostic pop
 		
 	} else if (f.needArg == FDICT_NEEDSTRING) {
-		die("nyi");
+		// Find where the argument ends
+		int la = 0;
+		while (line[pa+la] != 0 && line[pa+la] != '\n') la++;
+		// Allocate some memory for the string
+		argument = malloc(la + 1);
+		// Copy in the string argument
+		memcpy(argument, line+pa, la);
+		((char*)argument)[la] = 0;
 	}
 
 	// Create the structure
@@ -286,6 +296,7 @@ void keybind(char* line, int start, int lineSize) {
 	newCombo->keycode = keycode;
 	newCombo->function = f.function;
 	newCombo->arg = argument;
+	newCombo->hasArg = f.needArg;
 
 	// Add the structure to the linked list
 	if (*comboList == NULL) {

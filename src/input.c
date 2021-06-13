@@ -1,5 +1,6 @@
 #include "clientList.h"
 #include "util.h"
+#include "settings.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -11,6 +12,8 @@ extern Display* display;
 extern Window root;
 extern bool running;
 extern Shared* shared;
+extern KeyCombo* rootKeyCombos;
+extern KeyCombo* clientKeyCombos;
 
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
@@ -24,55 +27,22 @@ Point mouseDownPos;
 Point initialFramedPos;
 Dimension initialFramedSize;
 
-char* stArgv[] = {"st", NULL};
-char* dmenuArgv[] = {"dmenu_run", NULL};
-
 void keyPress(XEvent e) {
 	// If the input is on the root window
 	if (e.xkey.window == root) {
-		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_q))) {
-			stop();
-			return;
-		}
-		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_p))) {
-			// Start dmenu
-			if (fork() == 0) {
-				setsid();
-				execvp(dmenuArgv[0], dmenuArgv);
-				exit(0);
+		// Search through the key combination list for the root window
+		for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
+			if ((front->modifiers & e.xkey.state) && e.xkey.keycode == front->keycode) {
+				if (front->hasArg == 0) {
+					void (*f)(void) = front->function;
+					f();
+				}
+				else {
+					void (*f)(void*) = front->function;
+					f(front->arg);
+				}
+				return;
 			}
-			return;
-		}
-		if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_Return))) {
-			// Start a new process by forking
-			if (fork() == 0) {
-				setsid();
-				execvp(stArgv[0], stArgv);
-				exit(0);
-			}
-			return;
-		}
-		if (e.xkey.state & Mod4Mask) {
-			if (e.xkey.keycode == XKeysymToKeycode(display, XK_1)) {
-					selectTag(1);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_2)) {
-					selectTag(2);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_3)) {
-					selectTag(3);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_4)) {
-					selectTag(4);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_5)) {
-					selectTag(5);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_6)) {
-					selectTag(6);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_7)) {
-					selectTag(7);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_8)) {
-					selectTag(8);
-			} else if (e.xkey.keycode == XKeysymToKeycode(display, XK_9)) {
-					selectTag(9);
-			}
-		}
 	}
 	
 	// Get client associated with this window. If there isn't one, then do nothing

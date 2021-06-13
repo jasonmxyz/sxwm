@@ -31,6 +31,7 @@ struct KeyCombo {
 	void* function;
 	void* arg;
 	KeyCombo* next;
+	int hasArg;
 };
 
 typedef struct fDict fDict;
