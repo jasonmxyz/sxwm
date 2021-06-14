@@ -7,20 +7,19 @@
 #include <X11/Xlib.h>
 
 extern Display* display;
-Client* clients = NULL;
-int clientCount = 0;
+extern Monitor* monitor;
 
 // Add a client to the front of the list
 void addClient(Client* client) {
-	client->next = clients;
-	clients = client;
-	if(clients->next != NULL) (clients->next)->previous = clients;
-	clientCount++;
+	if (monitor->clients != NULL) (monitor->clients)->previous = client;
+	client->next = monitor->clients;
+	monitor->clients = client;
+	monitor->clientCount++;
 }
 
 // Get the frame window given the client window
 Window getClientFrame(Window window) {
-	Client* current = clients;
+	Client* current = monitor->clients;
 	while (current != NULL) {
 		if (current->window == window) {
 			return current->frame;
@@ -32,12 +31,12 @@ Window getClientFrame(Window window) {
 
 // Removes a client from the list given the client window
 void removeClient(Window window) {
-	for (Client* c = clients; c != NULL; c = c->next) {
+	for (Client* c = monitor->clients; c != NULL; c = c->next) {
 		if (c->window == window) {
 			if (c->previous != NULL) (c->previous)->next = c->next;
-			else clients = c->next;
+			else monitor->clients = c->next;
 			if (c->next != NULL) (c->next)->previous = c->previous;
-			clientCount--;
+			monitor->clientCount--;
 			free(c);
 			return;
 		}
@@ -46,7 +45,7 @@ void removeClient(Window window) {
 
 // Return the Client* associated with a window
 Client* getClientByWindow(Window window) {
-	Client* current = clients;
+	Client* current = monitor->clients;
 	while (current != NULL) {
 		if (current->window == window) {
 			return current;

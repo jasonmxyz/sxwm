@@ -17,5 +17,3 @@ bind	win+shift+enter	run st
 
 # Commands to run before running
 run		feh --no-fehbg --bg-fill /home/jason/.local/background/single.jpg
-run echo multiple commands
-run echo can be used here

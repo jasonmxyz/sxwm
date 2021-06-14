@@ -21,6 +21,7 @@ typedef struct Monitor Monitor;
 struct Monitor {
 	int width, height;
 	Client* clients;
+	int clientCount;
 };
 
 void addClient(Client* client);

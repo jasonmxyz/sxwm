@@ -148,10 +148,11 @@ int detectWM(Display* display, XErrorEvent* e) {
 
 // Get information about the display and store it in the monitor structure.
 void getMonitors() {
-	if (monitor != NULL) free(monitor);
 	monitor = malloc(sizeof(Monitor));
 
 	int s = DefaultScreen(display);
 	monitor->width = DisplayWidth(display, s);
 	monitor->height = DisplayHeight(display, s);
+	monitor->clients = NULL;
+	monitor->clientCount = 0;
 }

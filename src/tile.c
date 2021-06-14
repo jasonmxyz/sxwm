@@ -7,8 +7,6 @@ extern TileSettings tileSettings;
 extern Settings settings;
 extern BarSettings barSettings;
 extern Monitor* monitor;
-extern Client* clients;
-extern int clientCount;
 extern Display* display;
 extern Shared* shared;
 
@@ -16,7 +14,7 @@ extern Shared* shared;
 void tile() {
 	// Count the number of non-floating windows
 	int toTile = 0;
-	for (Client* c = clients; c != NULL; c=c->next)
+	for (Client* c = monitor->clients; c != NULL; c=c->next)
 		if (!(c->floating) && (c->tag == shared->currentTag)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
@@ -39,7 +37,7 @@ void tile() {
 
 	// Organise the windows
 	int i = 0;
-	for (Client* c = clients; c != NULL; c=c->next) {
+	for (Client* c = monitor->clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
 		if (!(c->floating) && (c->tag == shared->currentTag)) {
 			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
