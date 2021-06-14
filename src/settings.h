@@ -34,6 +34,12 @@ struct KeyCombo {
 	int hasArg;
 };
 
+typedef struct CmdQueue CmdQueue;
+struct CmdQueue {
+	char* cmd;
+	CmdQueue* next;
+};
+
 typedef struct fDict fDict;
 struct fDict {
 	char* name;

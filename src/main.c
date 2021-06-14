@@ -18,11 +18,13 @@ Window root;           // The root window of this display
 Shared* shared; // A shared memory segment
 int sid; // The id of the segment
 extern KeyCombo* rootKeyCombos;
+extern CmdQueue* commandQueue;
 
 extern void createBar();
 extern void handle(XEvent e);
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern void readSettings(char* path);
+extern void runCmd(char* cmd);
 
 int detectWM(Display* display, XErrorEvent* e);
 
@@ -58,6 +60,12 @@ int main(int argc, char** argv) {
 
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
+
+	// Run all of the commands from the command queue in new processes
+	CmdQueue* front;
+	for (front = commandQueue; front != NULL; front = front->next) {
+		runCmd(front->cmd);
+	}
 
 	// Populate the screen structure with the geometry of the display
 	getMonitors();

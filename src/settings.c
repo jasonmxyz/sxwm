@@ -31,6 +31,8 @@ TileSettings tileSettings = {
 KeyCombo* rootKeyCombos = NULL;
 KeyCombo* clientKeyCombos = NULL;
 
+CmdQueue* commandQueue = NULL;
+
 // Arrays of bindable functions
 extern void selectTag(int t);
 extern void stop();
@@ -119,7 +121,7 @@ void readSettings(char* path) {
 	fclose(f);
 }
 
-// Run a command
+// Run a command at an appropriate time
 void doStmt(char* line, int start) {
 	// Move along to find the start of the command at the first non-whitespace character
 	int p = start; // The start of the word 'run'
@@ -129,8 +131,29 @@ void doStmt(char* line, int start) {
 	// If we reached the end of the line, then this line is invalid
 	if (line[p] == 0 || line[p] == '\n') dief("No command specified.\n> %s", line+start);
 
-	// Run the command in a new thread with runCmd
-	runCmd(line+p);
+	// Find the end of the command
+	int l = 1;
+	while (line[p+l] != 0 && line[p+l] != '\n' && line[p+l] != '\t') l++;
+
+	// Create a CmdQueue object
+	CmdQueue* new = malloc(sizeof(CmdQueue));
+	// Copy the command into a new string
+	char* cmd = malloc(l + 1);
+	memcpy(cmd, line + p, l);
+	cmd[l] = 0;
+
+	new->cmd = cmd;
+	new->next = NULL;
+
+	// Add this commands to the queue of commands to run later
+	if (commandQueue == NULL) {
+		commandQueue = new;
+		return;
+	}
+	// Go to the end of the linked list
+	CmdQueue* front = commandQueue;
+	while (front->next != NULL) front = front->next;
+	front->next = new;
 }
 
 // Save a keybinding to the relevant data structure
