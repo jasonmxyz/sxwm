@@ -61,10 +61,15 @@ int main(int argc, char** argv) {
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
 
-	// Run all of the commands from the command queue in new processes
-	CmdQueue* front;
-	for (front = commandQueue; front != NULL; front = front->next) {
+	// Run all of the commands from the command queue in new processes, and free up the memory used
+	// by the queue and the command strings inside it.
+	CmdQueue* front = commandQueue;
+	while (front != NULL) {
 		runCmd(front->cmd);
+		free(front->cmd);
+		CmdQueue* next = front->next;
+		free(front);
+		front = next;
 	}
 
 	// Populate the screen structure with the geometry of the display
