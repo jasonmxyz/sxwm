@@ -27,4 +27,3 @@ void addClient(Client* client);
 Window getClientFrame(Window window);
 void removeClient(Window window);
 Client* getClientByWindow(Window window);
-void getMonitors();

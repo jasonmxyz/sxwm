@@ -13,8 +13,9 @@
 #include <getopt.h>
 #include <libgen.h>
 
-Display* display;      // The X display to connected to
-Window root;           // The root window of this display
+Display* display;        // The X display to connected to
+Window root;             // The root window of this display
+Monitor* monitor = NULL; // Data about the display
 
 Shared* shared; // A shared memory segment
 int sid; // The id of the segment
@@ -28,6 +29,7 @@ extern void readSettings(char* path);
 extern void runCmd(char* cmd);
 
 int detectWM(Display* display, XErrorEvent* e);
+void getMonitors();
 
 int main(int argc, char** argv) {
 	// Create the shared memory segment with read and write permissions on a new private segment.
@@ -142,4 +144,14 @@ int main(int argc, char** argv) {
 int detectWM(Display* display, XErrorEvent* e) {
 	die("There is already a window manager running on this display.");
 	return 1;
+}
+
+// Get information about the display and store it in the monitor structure.
+void getMonitors() {
+	if (monitor != NULL) free(monitor);
+	monitor = malloc(sizeof(Monitor));
+
+	int s = DefaultScreen(display);
+	monitor->width = DisplayWidth(display, s);
+	monitor->height = DisplayHeight(display, s);
 }

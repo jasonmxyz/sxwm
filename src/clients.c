@@ -7,7 +7,6 @@
 #include <X11/Xlib.h>
 
 extern Display* display;
-Monitor* monitor = NULL;
 Client* clients = NULL;
 int clientCount = 0;
 
@@ -55,13 +54,4 @@ Client* getClientByWindow(Window window) {
 		current = current->next;
 	}
 	return NULL;
-}
-
-void getMonitors() {
-	if (monitor != NULL) free(monitor);
-	monitor = malloc(sizeof(Monitor));
-
-	int s = DefaultScreen(display);
-	monitor->width = DisplayWidth(display, s);
-	monitor->height = DisplayHeight(display, s);
 }
