@@ -24,17 +24,17 @@ void dief_(int line, char* file, char* fmt, ...) {
     vprintf(fmt, args);
     va_end(args);
     printf("\n %s at line %d\n", file, line);
+    shared->running = false;
     shmdt(shared);
     shmctl(sid, IPC_RMID, 0);
-    shared->running = false;
     exit(1);
 }
 #else
 void die_(char* message) {
     printf("%s: %s\n", basename(shared->argv[0]), message);
+    shared->running = false;
     shmdt(shared);
     shmctl(sid, IPC_RMID, 0);
-    shared->running = false;
     exit(1);
 }
 void dief_(char* fmt, ...) {
