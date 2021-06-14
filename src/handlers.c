@@ -1,5 +1,5 @@
 #include "util.h"
-#include "clientList.h"
+#include "clients.h"
 #include "settings.h"
 
 #include <stdio.h>

@@ -1,6 +1,5 @@
 #include "util.h"
-#include "clientList.h"
-#include "monitors.h"
+#include "clients.h"
 #include "settings.h"
 
 #include <X11/Xlib.h>

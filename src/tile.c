@@ -1,5 +1,4 @@
-#include "clientList.h"
-#include "monitors.h"
+#include "clients.h"
 #include "settings.h"
 
 #include <stdio.h>
