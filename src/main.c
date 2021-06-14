@@ -10,8 +10,8 @@
 #include <X11/keysym.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
+#include <string.h>
 
-char** g_argv;         // Copy of argv to use in other functions
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
 
@@ -29,7 +29,27 @@ extern void runCmd(char* cmd);
 int detectWM(Display* display, XErrorEvent* e);
 
 int main(int argc, char** argv) {
-	g_argv = argv; // Preserve argv.
+	// Create the shared memory segment with read and write permissions on a new private segment.
+	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+	shared = shmat(sid, NULL, 0);
+
+	// Populate the shared structure with some important information to share. Including a copy of
+	// argv.
+	shared->currentTag = 1;
+	shared->bar = (Window)NULL;
+	shared->running = true;
+	shared->argc = argc;
+	shared->argv = malloc(sizeof(char*) * (argc + 1));
+	for (int i = 0; i < argc; i++) {
+		// Count the length of the string in argv[i]
+		int l = 0;
+		while (argv[i][l] != 0) l++;
+
+		// Allocate the string and copy it in.
+		shared->argv[i] = malloc(l + 1);
+		memcpy(shared->argv[i], argv[i], l + 1);
+	}
+	shared->argv[argc] = NULL;
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
@@ -41,14 +61,6 @@ int main(int argc, char** argv) {
 
 	// Load the settings into the relevant data structures
 	readSettings(argv[1]);
-
-	// Create the shared memory segment with read and write permissions on a new private segment.
-	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
-	shared = shmat(sid, NULL, 0);
-
-	shared->currentTag = 1;
-	shared->bar = (Window)NULL;
-	shared->running = true;
 
 	root = XDefaultRootWindow(display);
 

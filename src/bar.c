@@ -42,7 +42,7 @@ void createBar() {
 	gc = XCreateGC(d, r, 0, NULL);
 
 	XEvent e;
-	for (;;) {
+	while(shared->running) {
 		XNextEvent(d, &e);
 		if (e.type == Expose) {
 			draw();
