@@ -52,6 +52,10 @@ extern Display* display;
 
 // Read a configuration from a given file
 void readSettings(char* path) {
+	// If the path is not set, then check in some of the predefined locations for it.
+	// TODO
+	if (path == NULL) die("No configuration file specified.");
+
 	// Attempt to open the file in read mode
 	FILE *f = fopen(path, "r");
 

@@ -11,6 +11,8 @@
 #include <sys/shm.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <getopt.h>
+#include <libgen.h>
 
 Display* display;      // The X display to connected to
 Window root;           // The root window of this display
@@ -33,12 +35,42 @@ int main(int argc, char** argv) {
 	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
 	shared = shmat(sid, NULL, 0);
 
-	// Populate the shared structure with some important information to share. Including a copy of
-	// argv.
+	// Populate the shared structure with some important information to share.
 	shared->currentTag = 1;
 	shared->bar = (Window)NULL;
 	shared->running = true;
 	shared->argc = argc;
+	shared->argv = argv;
+
+	// Get the command line options
+	char* configFile = NULL;
+	struct option options[3] = {{"help", no_argument, 0, 'h'},
+								{"config", required_argument, 0, 'c'},
+								{0, 0, 0, 0}};
+	int opt;
+	opterr = 0; // Stop getopt from printing errors.
+	// Look through argv for the above options
+	while ((opt = getopt_long(argc, argv, ":hc:", options, NULL)) != -1) {
+		switch (opt) {
+			// If the -h or --help option was given then print a usage statement and exit
+			case 'h':
+				printf("Usage: %s [--help] [--config <FILE>]\n", basename(argv[0]));
+				exit(0);
+			// If a config file is specified, remember the char* in argv
+			case 'c':
+				configFile = optarg;
+				break;
+			// If an unrecognised option was given
+			case '?':
+				dief("Unrecognised option %s", argv[optind-1]);
+			case ':':
+				dief("Missing argument for %s", argv[optind-1]);
+			default:
+				dief("Unknown error while parsing arguments.");
+		}
+	}
+
+	// Copy argv into the shared memory segment so it can be used by die in all processes
 	shared->argv = malloc(sizeof(char*) * (argc + 1));
 	for (int i = 0; i < argc; i++) {
 		// Count the length of the string in argv[i]
@@ -56,11 +88,8 @@ int main(int argc, char** argv) {
 	if (display == NULL)
 		die("Could not connect to X display.");
 
-	// Quick and dirty for now. Check that there is an argument, and pass that to readSettings
-	if (argc != 2) die("Incorrect number of arguments.");
-
 	// Load the settings into the relevant data structures
-	readSettings(argv[1]);
+	readSettings(configFile);
 
 	root = XDefaultRootWindow(display);
 
