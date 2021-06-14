@@ -62,11 +62,11 @@ int main(int argc, char** argv) {
 				break;
 			// If an unrecognised option was given
 			case '?':
-				dief("Unrecognised option %s", argv[optind-1]);
+				die("Unrecognised option %s", argv[optind-1]);
 			case ':':
-				dief("Missing argument for %s", argv[optind-1]);
+				die("Missing argument for %s", argv[optind-1]);
 			default:
-				dief("Unknown error while parsing arguments.");
+				die("Unknown error while parsing arguments.");
 		}
 	}
 

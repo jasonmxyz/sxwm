@@ -133,7 +133,7 @@ void doStmt(char* line, int start) {
 	while (line[p] == ' ' || line[p] == '\t') p++;
 
 	// If we reached the end of the line, then this line is invalid
-	if (line[p] == 0 || line[p] == '\n') dief("No command specified.\n> %s", line+start);
+	if (line[p] == 0 || line[p] == '\n') die("No command specified.\n> %s", line+start);
 
 	// Find the end of the command
 	int l = 1;
@@ -167,16 +167,16 @@ void keybind(char* line, int start, int lineSize) {
 	// If we ever find a newline or null byte, then we die.
 	int pk = start;
 	while (line[pk] != ' ' && line[pk] != '\t' && line[pk] != '\n' && line[pk] != 0) pk++;
-	if (line[pk] == 0 || line[pk] == '\n') dief("Too few arguments.\n> %s", line+start);
+	if (line[pk] == 0 || line[pk] == '\n') die("Too few arguments.\n> %s", line+start);
 	while (line[pk] == ' ' || line[pk] == '\t') pk++;
-	if (line[pk] == 0 || line[pk] == '\n') dief("Too few arguments.\n> %s", line+start);
+	if (line[pk] == 0 || line[pk] == '\n') die("Too few arguments.\n> %s", line+start);
 
 	// Do the same again to find the name of the function
 	int pf = pk;
 	while (line[pf] != ' ' && line[pf] != '\t' && line[pf] != '\n' && line[pf] != 0) pf++;
-	if (line[pf] == 0 || line[pf] == '\n') dief("Too few arguments.\n> %s", line+start);
+	if (line[pf] == 0 || line[pf] == '\n') die("Too few arguments.\n> %s", line+start);
 	while (line[pf] == ' ' || line[pf] == '\t') pf++;
-	if (line[pf] == 0 || line[pf] == '\n') dief("Too few arguments.\n> %s", line+start);
+	if (line[pf] == 0 || line[pf] == '\n') die("Too few arguments.\n> %s", line+start);
 
 	// Find the length of the name of the function
 	int lf = 0;
@@ -204,7 +204,7 @@ void keybind(char* line, int start, int lineSize) {
 		}
 	
 	// If no function was found, then die
-	if (f.name == NULL) dief("Invalid function name \"%s\".", line + pf);
+	if (f.name == NULL) die("Invalid function name \"%s\".", line + pf);
 	// Restore the character after the function name
 	line[pf+lf] = borrowed;
 
@@ -212,7 +212,7 @@ void keybind(char* line, int start, int lineSize) {
 	unsigned int mask = 0;
 	int keycode = 0;
 
-	int ppk = pk; // Preserve for dief
+	int ppk = pk; // Preserve for die
 	int p = pk;
 	do {
 		p++;
@@ -235,9 +235,9 @@ void keybind(char* line, int start, int lineSize) {
 						break;
 					}
 					if (memcmp(line + pk, "space", 5) != 0) {
-						// Place a null byte for the convenience of dief
+						// Place a null byte for the convenience of die
 						line[p] = 0;
-						dief("Unknown mask \"%s\".", line + pk);
+						die("Unknown mask \"%s\".", line + pk);
 					}
 					// We can replace the character at line[pk] sneakily with a space and reuse the
 					// code below.
@@ -253,7 +253,7 @@ void keybind(char* line, int start, int lineSize) {
 					KeySym ks = XStringToKeysym(keystring);
 					keycode = (int)XKeysymToKeycode(display, ks);
 					// If XKeysymToKeycode fails, it will return NoSymbol.
-					if (keycode == NoSymbol) dief("No symbol matched to \'%c\'.", line[pk]);
+					if (keycode == NoSymbol) die("No symbol matched to \'%c\'.", line[pk]);
 
 					// If we had a space, then we must replace the character we swapped out
 					if (b != 0) line[pk] = b;
@@ -265,7 +265,7 @@ void keybind(char* line, int start, int lineSize) {
 					else if (memcmp(line + pk, "alt", 3) == 0) mask |= Mod1Mask;
 					else {
 						line[p] = 0;
-						dief("Unknown mask \"%s\".", line + pk);
+						die("Unknown mask \"%s\".", line + pk);
 					}
 					break;
 				}
@@ -274,14 +274,14 @@ void keybind(char* line, int start, int lineSize) {
 					if (memcmp(line + pk, "ctrl", 4) == 0) mask |= ControlMask;
 					else {
 						line[p] = 0;
-						dief("Unknown mask \"%s\".", line + pk);
+						die("Unknown mask \"%s\".", line + pk);
 					}
 					break;
 				}
 				default:
 					// If the key doesn't match, then die
 					line[p] = 0;
-					dief("Unknown mask \"%s\".", line + pk);
+					die("Unknown mask \"%s\".", line + pk);
 			}
 
 			// Reset pk and p to look at the next key/mask
@@ -294,7 +294,7 @@ void keybind(char* line, int start, int lineSize) {
 	// If keycode was not set, then die
 	if (keycode == 0) {
 		line[p] = 0;
-		dief("Invalid key combination \"%s\"\n At least one printable charater is needed.", line+ppk);
+		die("Invalid key combination \"%s\"\n At least one printable charater is needed.", line+ppk);
 	}
 
 	// Determine whether there is an argument given
@@ -303,8 +303,8 @@ void keybind(char* line, int start, int lineSize) {
 	while (line[pa] == ' ' || line[pa] == '\t') pa++;
 	if (line[pa] == '\n' || line[pa] == 0) hasArg = false;
 
-	if (f.needArg == 0 && hasArg) dief("No argument required for function \"%s\"\n> %s", f.name, line);
-	if (f.needArg != 0 && !hasArg) dief("Argument required for function \"%s\"\n> %s", f.name, line);
+	if (f.needArg == 0 && hasArg) die("No argument required for function \"%s\"\n> %s", f.name, line);
+	if (f.needArg != 0 && !hasArg) die("Argument required for function \"%s\"\n> %s", f.name, line);
 
 	void* argument = NULL;
 
@@ -317,7 +317,7 @@ void keybind(char* line, int start, int lineSize) {
 		if (line[pa+la] != 0 && line[pa+la] != '\n' && line[pa+la] != ' ') {
 			while (line[la+pa] != 0 && line[la+pa] != ' ' && line[la+pa] != '\n' && line[la+pa] != '\t') la++;
 			line[pa+la] = 0;
-			dief("The argument given \"%s\" is not an integer.", line + pa);
+			die("The argument given \"%s\" is not an integer.", line + pa);
 		}
 		line[pa+la] = 0;
 		#pragma GCC diagnostic ignored "-Wint-to-pointer-cast" // This is dodgy
