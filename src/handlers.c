@@ -1,6 +1,7 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
+#include "shared.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -11,7 +12,6 @@
 
 extern Display* display;
 extern Window root;
-extern Shared* shared;
 extern Settings settings;
 
 extern void keyPress(XEvent e);

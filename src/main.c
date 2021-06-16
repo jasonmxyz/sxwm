@@ -1,14 +1,13 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
+#include "shared.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
-#include <sys/shm.h>
-#include <sys/stat.h>
 #include <string.h>
 #include <getopt.h>
 #include <libgen.h>
@@ -17,8 +16,6 @@ Display* display;        // The X display to connected to
 Window root;             // The root window of this display
 Monitor* monitor = NULL; // Data about the display
 
-Shared* shared; // A shared memory segment
-int sid; // The id of the segment
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
 
@@ -33,8 +30,8 @@ void getMonitors();
 
 int main(int argc, char** argv) {
 	// Create the shared memory segment with read and write permissions on a new private segment.
-	int sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
-	shared = shmat(sid, NULL, 0);
+	createSharedMemory();
+	attachToSharedMemory();
 
 	// Populate the shared structure with some important information to share.
 	shared->currentTag = 1;
@@ -133,9 +130,8 @@ int main(int argc, char** argv) {
 
 	XCloseDisplay(display);
 
-	// Detatch from and destroy the shared memory segment
-	shmdt(shared);
-    shmctl(sid, IPC_RMID, 0);
+	detatchFromSharedMemory();
+	destroySharedMemory();
 
 	return 0;
 }

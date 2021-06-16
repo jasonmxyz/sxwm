@@ -16,12 +16,3 @@ typedef Point Dimension;
 struct Point {
 	int x, y;
 };
-
-typedef struct Shared Shared;
-struct Shared {
-	int currentTag;
-	Window bar;
-	bool running;
-	char** argv;
-	int argc;
-};

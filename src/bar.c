@@ -1,5 +1,6 @@
 #include "util.h"
 #include "settings.h"
+#include "shared.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -10,9 +11,6 @@
 #include <sys/shm.h>
 
 extern BarSettings barSettings;
-
-extern int sid;
-extern Shared* shared;
 
 Window bar;
 Display* d;
@@ -52,8 +50,8 @@ void createBar() {
 	XCloseDisplay(d);
 
 	// Detach from and remove the shared memory segment.
-	shmdt(shared);
-    shmctl(sid, IPC_RMID, 0);
+	detatchFromSharedMemory();
+	destroySharedMemory();
 
 	exit(0);
 }

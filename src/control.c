@@ -1,4 +1,5 @@
 #include "util.h"
+#include "shared.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -6,8 +7,6 @@
 #include <string.h>
 #include <X11/Xlib.h>
 #include <stdio.h>
-
-extern Shared* shared;
 
 extern Display* display;
 

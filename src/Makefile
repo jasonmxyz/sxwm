@@ -2,8 +2,8 @@ CC := gcc
 CFLAGS := -std=c99 -g -D VERBOSE
 LIBS := -lX11
 
-FILES := main util clients handlers tile input bar settings control
-HEADERS := util.h clients.h settings.h
+FILES := main util clients handlers tile input bar settings control shared
+HEADERS := util.h clients.h settings.h shared.h
 OBJ := $(addsuffix .o, $(FILES) )
 DEP := $(HEADERS) Makefile
 

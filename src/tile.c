@@ -1,5 +1,6 @@
 #include "clients.h"
 #include "settings.h"
+#include "shared.h"
 
 #include <stdio.h>
 
@@ -8,7 +9,6 @@ extern Settings settings;
 extern BarSettings barSettings;
 extern Monitor* monitor;
 extern Display* display;
-extern Shared* shared;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {

@@ -1,6 +1,7 @@
 #include "clients.h"
 #include "util.h"
 #include "settings.h"
+#include "shared.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -11,7 +12,6 @@
 extern Display* display;
 extern Window root;
 extern bool running;
-extern Shared* shared;
 extern KeyCombo* rootKeyCombos;
 extern KeyCombo* clientKeyCombos;
 
