@@ -1,5 +1,6 @@
 #include "clients.h"
 #include "util.h"
+#include "shared.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,10 +8,10 @@
 #include <X11/Xlib.h>
 
 extern Display* display;
-extern Monitor* monitor;
 
 // Add a client to the front of the list
 void addClient(Client* client) {
+	Monitor* monitor = *monitorList;
 	if (monitor->clients != NULL) (monitor->clients)->previous = client;
 	client->next = monitor->clients;
 	monitor->clients = client;
@@ -19,6 +20,7 @@ void addClient(Client* client) {
 
 // Get the frame window given the client window
 Window getClientFrame(Window window) {
+	Monitor* monitor = *monitorList;
 	Client* current = monitor->clients;
 	while (current != NULL) {
 		if (current->window == window) {
@@ -31,6 +33,7 @@ Window getClientFrame(Window window) {
 
 // Removes a client from the list given the client window
 void removeClient(Window window) {
+	Monitor* monitor = *monitorList;
 	for (Client* c = monitor->clients; c != NULL; c = c->next) {
 		if (c->window == window) {
 			if (c->previous != NULL) (c->previous)->next = c->next;
@@ -45,6 +48,7 @@ void removeClient(Window window) {
 
 // Return the Client* associated with a window
 Client* getClientByWindow(Window window) {
+	Monitor* monitor = *monitorList;
 	Client* current = monitor->clients;
 	while (current != NULL) {
 		if (current->window == window) {

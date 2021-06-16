@@ -14,7 +14,6 @@
 
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
-Monitor* monitor = NULL; // Data about the display
 
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
@@ -144,9 +143,10 @@ int detectWM(Display* display, XErrorEvent* e) {
 
 // Get information about the display and store it in the monitor structure.
 void getMonitors() {
-	monitor = malloc(sizeof(Monitor));
+	*monitorList = malloc(sizeof(Monitor));
 
 	int s = DefaultScreen(display);
+	Monitor* monitor = *monitorList;
 	monitor->width = DisplayWidth(display, s);
 	monitor->height = DisplayHeight(display, s);
 	monitor->clients = NULL;

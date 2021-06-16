@@ -7,11 +7,11 @@
 extern TileSettings tileSettings;
 extern Settings settings;
 extern BarSettings barSettings;
-extern Monitor* monitor;
 extern Display* display;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
+	Monitor* monitor = *monitorList;
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = monitor->clients; c != NULL; c=c->next)

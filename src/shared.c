@@ -6,6 +6,7 @@
 
 int sid;
 Shared* shared = NULL;
+Monitor** monitorList = NULL;
 
 // Create the shared memory segment and create references to the variables within for easy access
 // in all parts of the project.
@@ -27,6 +28,7 @@ void attachToSharedMemory() {
 
 	// Update the global variables to reference the shared memory segment.
 	shared = s;
+	monitorList = &(shared->monitor);
 }
 
 // Detatch from the shared memory segment
