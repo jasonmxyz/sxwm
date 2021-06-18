@@ -28,9 +28,9 @@ int detectWM(Display* display, XErrorEvent* e);
 void getMonitors();
 
 int main(int argc, char** argv) {
-	// Create the shared memory segment with read and write permissions on a new private segment.
+	// Create the shared memory region and get the location of some data structures within it.
 	createSharedMemory();
-	attachToSharedMemory();
+	getMemoryPointers();
 
 	// Populate the shared structure with some important information to share.
 	shared->currentTag = 1;
@@ -128,9 +128,6 @@ int main(int argc, char** argv) {
 	}
 
 	XCloseDisplay(display);
-
-	detatchFromSharedMemory();
-	destroySharedMemory();
 
 	return 0;
 }

@@ -1,42 +1,34 @@
 #include "shared.h"
 #include "util.h"
 
-#include <sys/shm.h>
-#include <sys/stat.h>
+#include <sys/mman.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-int sid;
+int size = 0;
+void* location = 0;
 Shared* shared = NULL;
 Monitor** monitorList = NULL;
 
 // Create the shared memory segment and create references to the variables within for easy access
 // in all parts of the project.
 void createSharedMemory() {
-	// The segment should be private, with read and write access for us.
-	sid = shmget(IPC_PRIVATE, sizeof(Shared), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+	// Determine the size of memory to map. The smallest number of full pages which will fit the
+	// Shared data structure.
+	int s = (sizeof(Shared)/4096 + 1) * 4096;
+
+	// Map the mempry and record the location/size
+	location = mmap(NULL, s,PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
 	// -1 is returned on error
-	if (sid == -1) die("Could not create shared memory segment.");
+	if (location == (void*)-1) {
+		printf("Could not allocate memory.\n");
+		exit(1);
+	}
 }
 
-// Attach the currnet process to the shared memory segment with the id in `sid`.
-void attachToSharedMemory() {
-	// Attach to the segment
-	Shared* s = shmat(sid, NULL, 0);
-
-	// -1 is returned on error
-	if (s == (Shared*)-1) die("Could not attach to shared memory segment.");
-
-	// Update the global variables to reference the shared memory segment.
-	shared = s;
+// Set some variable pointers to point to the allocated memory
+void getMemoryPointers() {
+	shared = location;
 	monitorList = &(shared->monitor);
-}
-
-// Detatch from the shared memory segment
-void detatchFromSharedMemory() {
-	shmdt(shared);
-}
-
-// Destroy the shared memory segment
-void destroySharedMemory() {
-    shmctl(sid, IPC_RMID, 0);
 }

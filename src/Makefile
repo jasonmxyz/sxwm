@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c99 -g -D VERBOSE
+CFLAGS := -std=gnu11 -g -D VERBOSE
 LIBS := -lX11
 
 FILES := main util clients handlers tile input bar settings control shared
@@ -19,6 +19,3 @@ $(OBJ): %.o : %.c $(DEP)
 
 sxwm: % : $(OBJ)
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
-
-test: sxwm
-	xinit ./sxwm -- $$(which Xephyr) :1 -ac -br -screen 1280x720

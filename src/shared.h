@@ -25,10 +25,7 @@ struct Shared {
 };
 
 void createSharedMemory();
-void attachToSharedMemory();
-void detatchFromSharedMemory();
-void destroySharedMemory();
+void getMemoryPointers();
 
-extern int sid;
 extern Shared* shared;
 extern Monitor** monitorList;

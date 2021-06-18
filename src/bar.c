@@ -25,6 +25,9 @@ void createBar() {
 	if (result < 0) die("Could not create another thread");
 	if (result != 0) return;
 
+	// Make sure that pointers to shared memory are accurate
+	getMemoryPointers();
+
 	d = XOpenDisplay(NULL);
 	Window r = XDefaultRootWindow(d);
 	s = DefaultScreen(d);
@@ -48,10 +51,6 @@ void createBar() {
 	}
 
 	XCloseDisplay(d);
-
-	// Detach from and remove the shared memory segment.
-	detatchFromSharedMemory();
-	destroySharedMemory();
 
 	exit(0);
 }

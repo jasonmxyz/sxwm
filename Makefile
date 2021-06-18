@@ -1,7 +1,3 @@
-CC := gcc
-CFLAGS := -std=c99 -g -D VERBOSE
-LIBS := -lX11
-
 .PHONY: all clean
 
 all: sxwm

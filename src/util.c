@@ -16,8 +16,6 @@ void die_(int line, char* file, char* fmt, ...) {
     va_end(args);
     printf("\n %s at line %d\n", file, line);
     shared->running = false;
-    detatchFromSharedMemory();
-    destroySharedMemory();
     exit(1);
 }
 #else
@@ -29,8 +27,6 @@ void die_(char* fmt, ...) {
     va_end(args);
     printf("\n");
     shared->running = false;
-    detatchFromSharedMemory();
-    destroySharedMemory();
     exit(1);
 }
 #endif
