@@ -1,13 +1,16 @@
 CC = gcc
-CFLAGS = -std=gnu11 -g -D VERBOSE
+CFLAGS = -std=gnu11 -g
+DFLAGS = -D VERBOSE
 LIBS = -lX11
 OBJDIR = obj
 SRCDIR = src
 
-FILES := main util clients handlers tile input bar settings control shared
-HEADERS := util.h clients.h settings.h shared.h
-OBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(FILES)))
-DEP := $(addprefix $(SRCDIR)/, $(HEADERS)) Makefile
+NORMAL := main clients handlers tile input bar settings control shared
+DEBUG := util
+HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h shared.h)
+
+NOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(NORMAL)))
+DOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(DEBUG)))
 
 .PHONY: all clean objdir
 
@@ -19,10 +22,12 @@ objdir:
 clean: objdir
 	rm -f sxwm $(OBJDIR)/*
 
-$(OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(DEP) objdir
+$(NOBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
 	$(CC) -c -o $@ $< $(CFLAGS)
+$(DOBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
+	$(CC) -c -o $@ $< $(CFLAGS) $(DFLAGS)
 
-sxwm: % : $(OBJ)
+sxwm: % : $(NOBJ) $(DOBJ)
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
 
 test: sxwm
