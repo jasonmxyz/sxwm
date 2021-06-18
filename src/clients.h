@@ -16,7 +16,27 @@ struct Client {
 	Point floatingLocation;
 };
 
+// A structure to store the dimensions and client list of a monitor
+typedef struct Monitor Monitor;
+struct Monitor {
+	int width, height;
+	Client* clients;
+	int clientCount;
+};
+
+// The shared memory data structure
+typedef struct Shared Shared;
+struct Shared {
+	int currentTag;
+	Window bar;
+	bool running;
+	Monitor* monitor;
+};
+
 void addClient(Client* client);
 Window getClientFrame(Window window);
 void removeClient(Window window);
 Client* getClientByWindow(Window window);
+
+extern Shared* shared;
+extern Monitor** monitorList;

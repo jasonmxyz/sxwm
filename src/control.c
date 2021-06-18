@@ -1,5 +1,5 @@
 #include "util.h"
-#include "shared.h"
+#include "memory.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
