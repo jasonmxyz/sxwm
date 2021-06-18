@@ -7,8 +7,6 @@
 
 int size = 0;
 void* location = 0;
-Shared* shared = NULL;
-Monitor** monitorList = NULL;
 
 // Create the shared memory segment and create references to the variables within for easy access
 // in all parts of the project.
@@ -25,10 +23,4 @@ void createSharedMemory() {
 		printf("Could not allocate memory.\n");
 		exit(1);
 	}
-}
-
-// Set some variable pointers to point to the allocated memory
-void getMemoryPointers() {
-	shared = location;
-	monitorList = &(shared->monitor);
 }

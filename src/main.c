@@ -15,6 +15,9 @@
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
 
+Shared* shared = NULL;
+Monitor** monitorList = NULL;
+
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
 
@@ -30,7 +33,10 @@ void getMonitors();
 int main(int argc, char** argv) {
 	// Create the shared memory region and get the location of some data structures within it.
 	createSharedMemory();
-	getMemoryPointers();
+
+	// Allocate a structure to share between this process and the bar
+	shared = malloc(sizeof(Shared));
+	monitorList = &(shared->monitor);
 
 	// Populate the shared structure with some important information to share.
 	shared->currentTag = 1;

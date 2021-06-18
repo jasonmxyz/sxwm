@@ -25,7 +25,6 @@ struct Shared {
 };
 
 void createSharedMemory();
-void getMemoryPointers();
 
 extern Shared* shared;
 extern Monitor** monitorList;
