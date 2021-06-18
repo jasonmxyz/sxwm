@@ -101,7 +101,7 @@ void mapRequest(XEvent e) {
 	XAddToSaveSet(display, e.xmaprequest.window);
 
 	// Add a new client structure to the linked list of all clients
-	Client* newClient = calloc(1, sizeof(Client));
+	Client* newClient = scalloc(sizeof(Client));
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;

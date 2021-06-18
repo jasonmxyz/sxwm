@@ -5,8 +5,8 @@ LIBS = -lX11
 OBJDIR = obj
 SRCDIR = src
 
-NORMAL := main clients handlers tile input bar settings control shared
-DEBUG := util
+NORMAL := main clients handlers tile input bar settings control
+DEBUG := util shared
 HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h shared.h)
 
 NOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(NORMAL)))
