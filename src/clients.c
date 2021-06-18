@@ -40,7 +40,7 @@ void removeClient(Window window) {
 			else monitor->clients = c->next;
 			if (c->next != NULL) (c->next)->previous = c->previous;
 			monitor->clientCount--;
-			free(c);
+			sfree(c);
 			return;
 		}
 	}

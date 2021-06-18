@@ -85,17 +85,17 @@ void* smalloc(int length) {
 			pageInfo = pageInfo->next;
 		}
 		DEBUG("Page: location: %d", pageInfo);
-		DEBUG("Page: size:     %d", pageInfo->size);
+		DEBUG("Page: size:     %d\n", pageInfo->size);
 
 		// Try to allocate to each section in this page
 		// Exit the loop SMallocInfo structure is outside of the current page
 		for (SMallocInfo* mallocInfo = (SMallocInfo*)((void*)pageInfo + sizeof(PageInfo));
 			 mallocInfo < (SMallocInfo*)((void*)pageInfo + pageInfo->size);
-			 mallocInfo = mallocInfo + sizeof(SMallocInfo) + mallocInfo->size) {
+			 mallocInfo = (SMallocInfo*)((void*)mallocInfo + sizeof(SMallocInfo) + mallocInfo->size)) {
 			DEBUG("Section: location:  %d", mallocInfo);
 			DEBUG("Section: size:      %d", mallocInfo->size);
 			DEBUG("Section: prev:      %d", mallocInfo->prev);
-			DEBUG("Section: available: %d", mallocInfo->available);
+			DEBUG("Section: available: %d\n", mallocInfo->available);
 
 			// If this section is available, and is big enough, then use it
 			if (mallocInfo->available && mallocInfo->size >= length) {
@@ -104,13 +104,13 @@ void* smalloc(int length) {
 				// If it is possible to have another malloc between this one and
 				// the next, then create another structure after this one.
 				if (mallocInfo->size >= length + sizeof(SMallocInfo) + sizeof(int)) {
-					SMallocInfo* next = mallocInfo + sizeof(SMallocInfo) + length;
+					SMallocInfo* next = (SMallocInfo*)((void*)mallocInfo + sizeof(SMallocInfo) + length);
 					DEBUG("Createing new SMallocInfo at %d", next);
 					next->size = mallocInfo->size - length - sizeof(SMallocInfo);
 					next->available = true;
 					next->prev = mallocInfo;
 					DEBUG("                   with size %d", next->size);
-					DEBUG("                 previous is %d", next->prev);
+					DEBUG("                 previous is %d\n", next->prev);
 					mallocInfo->size = length;
 
 					// Update the next SMallocInfo if it exists
@@ -121,7 +121,7 @@ void* smalloc(int length) {
 					}
 				}
 
-				return mallocInfo + sizeof(SMallocInfo);
+				return ((void*)mallocInfo + sizeof(SMallocInfo));
 			}
 		}
 	}
@@ -138,4 +138,67 @@ void* scalloc(int length) {
 	memset(mem, 0, length);
 
 	return mem;
+}
+
+// Free up some memory allocated in the pages
+void sfree(void* addr) {
+	DEBUG("sfree address: %d", addr);
+
+	// Look in each page
+	PageInfo* pageInfo = location;
+	for (PageInfo* pageInfo = location; pageInfo != NULL; pageInfo = pageInfo->next) {
+		DEBUG("Page location: %d", pageInfo);
+		DEBUG("Page size:     %d", pageInfo->size);
+		// If the address is inside this page, then try and free it,
+		// otherwise, look at the next page
+		if (addr > (void*)pageInfo && addr < (void*)pageInfo + pageInfo->size) {
+			// Find the section which has this address
+			for (SMallocInfo* mallocInfo = (SMallocInfo*)((void*)pageInfo + sizeof(PageInfo));
+				 (void*)mallocInfo < addr;
+				 mallocInfo = (SMallocInfo*)((void*)mallocInfo + sizeof(SMallocInfo) + mallocInfo->size)) {
+				DEBUG("Section: location:  %d", mallocInfo);
+				DEBUG("Section: size:      %d", mallocInfo->size);
+				DEBUG("Section: prev:      %d", mallocInfo->prev);
+				DEBUG("Section: available: %d", mallocInfo->available);
+				// If the address of the start of this section matches, and
+				// this section is not already free, then we can free things.
+				if (addr == (void*)mallocInfo + sizeof(SMallocInfo) && !mallocInfo->available) {
+					mallocInfo->available = true;
+					DEBUG("Freeing");
+
+					// If the section to the right is available, then merge them
+					if ((void*)mallocInfo + 2*sizeof(SMallocInfo) + mallocInfo->size + sizeof(int) <= (void*)pageInfo + pageInfo->size) {
+						SMallocInfo* right = (SMallocInfo*)((void*)mallocInfo + sizeof(SMallocInfo) + mallocInfo->size);
+						if (right->available) {
+							DEBUG("Merging with right");
+							mallocInfo->size += sizeof(SMallocInfo) + right->size;
+							// If there is another section after the one to the
+							// right, then we need to update it's prev to point
+							// to this section
+							if ((void*)right + right->size + sizeof(SMallocInfo) < (void*)pageInfo + pageInfo->size) {
+								((SMallocInfo*)((void*)right + sizeof(SMallocInfo) + right->size))->prev = mallocInfo;
+							}
+						}
+					}
+
+					// If the section to the left is available
+					if (mallocInfo->prev != NULL && mallocInfo->prev->available) {
+						DEBUG("Merging with left");
+						mallocInfo->prev->size += sizeof(SMallocInfo) + mallocInfo->size;
+						// The section to the right of this one (if it exists)
+						// must now point to the previous section
+						if ((void*)mallocInfo + mallocInfo->size + sizeof(SMallocInfo) < ((void*)pageInfo + pageInfo->size)) {
+							((SMallocInfo*)((void*)mallocInfo + sizeof(SMallocInfo) + mallocInfo->size))->prev = mallocInfo->prev;
+						}
+					}
+					
+					// Done
+					return;
+				}
+			}
+
+			// We dont need to look further
+			return;
+		}
+	}
 }

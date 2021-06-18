@@ -44,6 +44,7 @@ struct Shared {
 void createSharedMemory();
 void* smalloc(int length);
 void* scalloc(int length);
+void sfree(void* addr);
 
 extern Shared* shared;
 extern Monitor** monitorList;
