@@ -6,26 +6,28 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+extern char** g_argv;
+
 void diel(char* fmt, ...) {
     va_list args;
-    printf("%s: ", basename(shared->argv[0]));
+    printf("%s: ", basename(g_argv[0]));
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
     printf("\n");
-    shared->running = false;
+    if (shared != NULL) shared->running = false;
     exit(1);
 }
 
 #ifdef VERBOSE
 void dief(int line, char* file, char* fmt, ...) {
     va_list args;
-    printf("%s: ", basename(shared->argv[0]));
+    printf("%s: ", basename(g_argv[0]));
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
     printf("\n %s at line %d\n", file, line);
-    shared->running = false;
+    if (shared != NULL) shared->running = false;
     exit(1);
 }
 

@@ -36,8 +36,6 @@ struct Shared {
 	int currentTag;
 	Window bar;
 	bool running;
-	char** argv;
-	int argc;
 	Monitor* monitor;
 };
 

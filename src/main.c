@@ -18,6 +18,8 @@ Window root;             // The root window of this display
 Shared* shared = NULL;
 Monitor** monitorList = NULL;
 
+char** g_argv = NULL;
+
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
 
@@ -31,19 +33,21 @@ int detectWM(Display* display, XErrorEvent* e);
 void getMonitors();
 
 int main(int argc, char** argv) {
+	// Preserve argv
+	g_argv = argv;
+
 	// Create the shared memory region and get the location of some data structures within it.
 	createSharedMemory();
 
 	// Allocate a structure to share between this process and the bar
-	shared = malloc(sizeof(Shared));
+	shared = smalloc(sizeof(Shared));
+	if (shared == NULL) die("Could not allocate memory.");
 	monitorList = &(shared->monitor);
 
 	// Populate the shared structure with some important information to share.
 	shared->currentTag = 1;
 	shared->bar = (Window)NULL;
 	shared->running = true;
-	shared->argc = argc;
-	shared->argv = argv;
 
 	// Get the command line options
 	char* configFile = NULL;
@@ -72,19 +76,6 @@ int main(int argc, char** argv) {
 				die("Unknown error while parsing arguments.");
 		}
 	}
-
-	// Copy argv into the shared memory segment so it can be used by die in all processes
-	shared->argv = malloc(sizeof(char*) * (argc + 1));
-	for (int i = 0; i < argc; i++) {
-		// Count the length of the string in argv[i]
-		int l = 0;
-		while (argv[i][l] != 0) l++;
-
-		// Allocate the string and copy it in.
-		shared->argv[i] = malloc(l + 1);
-		memcpy(shared->argv[i], argv[i], l + 1);
-	}
-	shared->argv[argc] = NULL;
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
