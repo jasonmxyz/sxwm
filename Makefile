@@ -15,7 +15,7 @@ HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h sxwm.h)
 
 # Find the names of all object files which are to be compiled with or without the debug flag
 DOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(DEBUG)))
-NOBJ := $(filter-out $(DOBJ), $(addprefix $(OBJDIR)/, $(addsuffix .o, $(BAR) $(SXWM))))
+NOBJ := $(filter-out $(DOBJ), $(addprefix $(OBJDIR)/, $(addsuffix .o, $(sort $(BAR) $(SXWM)))))
 
 .PHONY: all clean objdir
 

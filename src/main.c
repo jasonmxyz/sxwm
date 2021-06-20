@@ -21,7 +21,6 @@ Window root;             // The root window of this display
 
 Monitor* monitorList = NULL;
 extern int running;
-int currentTags = 1;
 
 char** g_argv = NULL;
 
@@ -94,6 +93,9 @@ int main(int argc, char** argv) {
 		die("Could not create shared memory.");
 	mapShared(1);
 	DEBUG("Created shared memory.");
+	// Set the value of the variables.
+	sxwmData->currentTags = 1;
+	memset(&(sxwmData->windowCounts), 0, sizeof(int)*sizeof(int)*8);
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.

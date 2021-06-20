@@ -1,5 +1,6 @@
 #include "clients.h"
 #include "settings.h"
+#include "sxwm.h"
 
 #include <stdio.h>
 
@@ -8,7 +9,6 @@ extern Settings settings;
 extern BarSettings barSettings;
 extern Display* display;
 extern Monitor* monitorList;
-extern int currentTags;
 
 // Aranges the windows on the screen into the tiling layout
 void tile() {
@@ -16,7 +16,7 @@ void tile() {
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = monitor->clients; c != NULL; c=c->next)
-		if (!(c->floating) && (c->tags & currentTags)) toTile++;
+		if (!(c->floating) && (c->tags & sxwmData->currentTags)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
 	//if (toTile == 0) return;
@@ -40,7 +40,7 @@ void tile() {
 	int i = 0;
 	for (Client* c = monitor->clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
-		if (!(c->floating) && (c->tags & currentTags)) {
+		if (!(c->floating) && (c->tags & sxwmData->currentTags)) {
 			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
 			XResizeWindow(display, c->window, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
 			XMoveWindow(display, c->frame, (i < tileSettings.masterCount ? tileSettings.gapSize : mw + (2 * tileSettings.gapSize)) - settings.borderWidth,
@@ -49,7 +49,7 @@ void tile() {
 			i++;
 		} 
 		// Put floating windows back where they should be
-		else if (c->tags & currentTags) {
+		else if (c->tags & sxwmData->currentTags) {
 			XMoveWindow(display, c->frame, (c->floatingLocation).x, (c->floatingLocation).y);
 		}
 		// Move other windows off the screen

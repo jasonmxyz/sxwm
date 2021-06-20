@@ -1,5 +1,6 @@
 #include "util.h"
 #include "clients.h"
+#include "sxwm.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -7,7 +8,6 @@
 
 extern void tile();
 int running = 1;
-extern int currentTags;
 
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
@@ -18,10 +18,10 @@ void selectTag(int t) {
 	else t = 1 << (t-1);
 
 	// If t is already the currently selected tag, then do nothing.
-	if (t == currentTags) return;
+	if (t == sxwmData->currentTags) return;
 
 	// Set the tag
-	currentTags = t;
+	sxwmData->currentTags = t;
 
 	// Retile the window
 	tile();

@@ -1,6 +1,7 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
+#include "sxwm.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -12,7 +13,6 @@
 extern Display* display;
 extern Window root;
 extern Settings settings;
-extern int currentTags;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -97,7 +97,7 @@ void mapRequest(XEvent e) {
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;
-	newClient->tags = currentTags;
+	newClient->tags = sxwmData->currentTags;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame
