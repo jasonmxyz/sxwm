@@ -8,6 +8,7 @@
 
 extern void tile();
 int running = 1;
+extern Display* display;
 
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
@@ -22,6 +23,13 @@ void selectTag(int t) {
 
 	// Set the tag
 	sxwmData->currentTags = t;
+
+	// Send an expose message to the bar
+	if (sxwmData->barWindow != 0) {
+		XEvent event;
+		event.type = Expose;
+		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+	}
 
 	// Retile the window
 	tile();
