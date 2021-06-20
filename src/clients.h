@@ -5,6 +5,12 @@
 #include <X11/Xlib.h>
 #include <stdbool.h>
 
+typedef struct Point Point;
+typedef Point Dimension;
+struct Point {
+	int x, y;
+};
+
 typedef struct Client Client;
 struct Client {
 	Window frame;

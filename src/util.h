@@ -1,7 +1,6 @@
 #pragma once
 
 #include <X11/Xlib.h>
-#include <stdbool.h>
 
 #ifdef VERBOSE
 
@@ -17,9 +16,3 @@ void diel(char* fmt, ...);
 #define DEBUG(X, ...)
 
 #endif
-
-typedef struct Point Point;
-typedef Point Dimension;
-struct Point {
-	int x, y;
-};
