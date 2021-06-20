@@ -80,8 +80,15 @@ void mapRequest(XEvent e) {
 	XWindowAttributes attrs;
 	XGetWindowAttributes(display, e.xmaprequest.window, &attrs);
 
-	// If the window has the override_redirect flag set, then do nothing
+	// If this is the bar, or another window with the override_redirect flag,
+	// then let it map itself however it likes.
 	if (attrs.override_redirect) {
+		XMapWindow(display, e.xmaprequest.window);
+		return;
+	}
+	XClassHint wc = {NULL, NULL};
+	XGetClassHint(display, e.xmaprequest.window, &wc);
+	if (strcmp(wc.res_name, "sxwm") == 0 && strcmp(wc.res_class, "sxwm-bar") == 0) {
 		XMapWindow(display, e.xmaprequest.window);
 		return;
 	}
