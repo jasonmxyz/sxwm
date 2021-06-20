@@ -32,8 +32,8 @@ void stop() {
 	running = false;
 }
 
-// Run a command in a new thread
-void runCmd(char* command) {
+// Run a program with execvp
+void startProgram(char* command, int newSession) {
 	int used = 0;
 	int size = 10;
 	char** cmd;
@@ -87,7 +87,7 @@ void runCmd(char* command) {
 
 	// Now we can fork and execute the program
 	if (fork() == 0) {
-		setsid();
+		if (newSession) setsid();
 		execvp(cmd[0], cmd);
 		// Free memory
 		for (int i = 0; i < used-1; i++) if (cmd[i] != NULL) free(cmd[i]);
@@ -99,3 +99,4 @@ void runCmd(char* command) {
 	for (int i = 0; i < used-1; i++) if (cmd[i] != NULL) free(cmd[i]);
 	free(cmd);
 }
+void runCmd(char* command) { startProgram(command, 1); }

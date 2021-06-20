@@ -37,6 +37,7 @@ struct KeyCombo {
 typedef struct CmdQueue CmdQueue;
 struct CmdQueue {
 	char* cmd;
+	int newSession;
 	CmdQueue* next;
 };
 

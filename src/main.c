@@ -31,7 +31,7 @@ extern void createBar();
 extern void handle(XEvent e);
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern void readSettings(char* path);
-extern void runCmd(char* cmd);
+extern void startProgram(char* cmd, int newSession);
 
 int detectWM(Display* display, XErrorEvent* e);
 void getMonitors();
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 	// by the queue and the command strings inside it.
 	CmdQueue* front = commandQueue;
 	while (front != NULL) {
-		runCmd(front->cmd);
+		startProgram(front->cmd, front->newSession);
 		free(front->cmd);
 		CmdQueue* next = front->next;
 		free(front);

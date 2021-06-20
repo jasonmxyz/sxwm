@@ -17,5 +17,9 @@ bind	win+shift+p		run dmenu_run -fn CascadiaCode:size=20
 bind	win+shift+enter	run st
 
 # Commands to run before running
+# run will start a program in a new process, but not in a new session, so when
+# sxwm closes, the created process will also end.
+# start will run a program in a new process but also in a new session, so if
+# sxwm closs, the program will continue.
 run		./sxwmbar
-run		feh --no-fehbg --bg-fill /home/jason/.local/background/single.jpg
+start	feh --no-fehbg --bg-fill /home/jason/.local/background/single.jpg
