@@ -17,4 +17,5 @@ bind	win+shift+p		run dmenu_run -fn CascadiaCode:size=20
 bind	win+shift+enter	run st
 
 # Commands to run before running
+run		./sxwmbar
 run		feh --no-fehbg --bg-fill /home/jason/.local/background/single.jpg

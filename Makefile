@@ -5,29 +5,37 @@ LIBS = -lX11
 OBJDIR = obj
 SRCDIR = src
 
-NORMAL := main clients handlers tile input settings control
-DEBUG := util
+# Code files for the bar and sxwm programs
+BAR = bar util
+SXWM = main clients handlers tile input settings control util
+# Which of the above files should be compiled with the debug flag?
+DEBUG := util bar
+
 HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h)
 
-NOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(NORMAL)))
+# Find the names of all object files which are to be compiled with or without the debug flag
 DOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(DEBUG)))
+NOBJ := $(filter-out $(DOBJ), $(addprefix $(OBJDIR)/, $(addsuffix .o, $(BAR) $(SXWM))))
 
 .PHONY: all clean objdir
 
-all: sxwm
+all: sxwm sxwmbar
 
 objdir:
 	mkdir -p $(OBJDIR)
 
 clean: objdir
-	rm -f sxwm $(OBJDIR)/*
+	rm -f sxwm bar $(OBJDIR)/*
 
 $(NOBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
 	$(CC) -c -o $@ $< $(CFLAGS)
 $(DOBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
 	$(CC) -c -o $@ $< $(CFLAGS) $(DFLAGS)
 
-sxwm: % : $(NOBJ) $(DOBJ)
+sxwm: % : $(addprefix $(OBJDIR)/, $(addsuffix .o, $(SXWM)))
+	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
+
+sxwmbar: % : $(addprefix $(OBJDIR)/, $(addsuffix .o, $(BAR)))
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
 
 test: sxwm
