@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "util.h"
+#include "sxwm.h"
 
 #include <stddef.h>
 #include <stdio.h>

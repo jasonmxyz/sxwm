@@ -26,6 +26,7 @@ char** g_argv = NULL;
 
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
+extern BarSettings barSettings;
 
 extern void createBar();
 extern void handle(XEvent e);
@@ -96,6 +97,8 @@ int main(int argc, char** argv) {
 	// Set the value of the variables.
 	sxwmData->currentTags = 1;
 	memset(&(sxwmData->windowCounts), 0, sizeof(int)*sizeof(int)*8);
+	// Copy settings into shared memory for the bar to use
+	memcpy(&(sxwmData->barSettings), &barSettings, sizeof(BarSettings));
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.
