@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	monitorList = &(shared->monitor);
 
 	// Populate the shared structure with some important information to share.
-	shared->currentTag = 1;
+	shared->currentTags = 1;
 	shared->bar = (Window)NULL;
 	shared->running = true;
 

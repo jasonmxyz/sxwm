@@ -105,7 +105,7 @@ void mapRequest(XEvent e) {
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;
-	newClient->tag = shared->currentTag;
+	newClient->tags = shared->currentTags;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame

@@ -15,13 +15,16 @@ extern void tile();
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
 	// If t is outside the range of possible tags, then do nothing.
-	if (t <= 0 || t > 9) return;
+	if (t < 0 || t > sizeof(int)*8) return;
+
+	if (t == 0) t = -1;
+	else t = 1 << (t-1);
 
 	// If t is already the currently selected tag, then do nothing.
-	if (t == shared->currentTag) return;
+	if (t == shared->currentTags) return;
 
 	// Set the tag
-	shared->currentTag = t;
+	shared->currentTags = t;
 
 	// Send an expose message to the bar if it exists
 	if (shared -> bar != (Window)NULL) {

@@ -12,7 +12,7 @@ struct Client {
 	Client* next;
 	Client* previous;
 	bool floating;
-	int tag;
+	int tags;
 	Point floatingLocation;
 };
 
@@ -27,7 +27,7 @@ struct Monitor {
 // The shared memory data structure
 typedef struct Shared Shared;
 struct Shared {
-	int currentTag;
+	int currentTags;
 	Window bar;
 	bool running;
 	Monitor* monitor;

@@ -70,16 +70,16 @@ void drawTags() {
 	char tag[] = {'1', 0};
 
 	// Draw each of the tag numbers, and indicate the currently selected tag with another color.
-	for (int i = 1; i <= 9; i++, tag[0]++) {
+	for (int i = 0; i < (sizeof(int) * 8); i++, tag[0]++) {
 		// If this tag is slected, then draw another coloured rectangle
-		if (i == shared->currentTag) {
+		if ((1 << i) & shared->currentTags) {
 			XSetForeground(d, gc, barSettings.bgColor1);
-			XFillRectangle(d, bar, gc, barSettings.height * (i-1), 0, barSettings.height, barSettings.height);
+			XFillRectangle(d, bar, gc, barSettings.height * (i), 0, barSettings.height, barSettings.height);
 			XSetForeground(d, gc, barSettings.fgColor1);
-			XDrawString(d, bar, gc, barSettings.height * (i-1) + 10, 20, tag, 1);
+			XDrawString(d, bar, gc, barSettings.height * (i) + 10, 20, tag, 1);
 			XSetForeground(d, gc, barSettings.fgColor2);
 		}
 		// Otherwise, just draw the number
-		XDrawString(d, bar, gc, barSettings.height * (i-1) + 10, 20, tag, 1);
+		XDrawString(d, bar, gc, barSettings.height * (i) + 10, 20, tag, 1);
 	}
 }
