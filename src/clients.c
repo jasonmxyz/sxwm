@@ -1,5 +1,6 @@
 #include "clients.h"
 #include "util.h"
+#include "sxwm.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,6 +17,10 @@ void addClient(Client* client) {
 	client->next = monitor->clients;
 	monitor->clients = client;
 	monitor->clientCount++;
+	for (int i = 0; i < sizeof(int)*8; i++) {
+		int t = 1 << i;
+		if (client->tags & t) sxwmData->windowCounts[i]++;
+	}
 }
 
 // Get the frame window given the client window
@@ -40,6 +45,10 @@ void removeClient(Window window) {
 			else monitor->clients = c->next;
 			if (c->next != NULL) (c->next)->previous = c->previous;
 			monitor->clientCount--;
+			for (int i = 0; i < sizeof(int)*8; i++) {
+				int t = 1 << i;
+				if (c->tags & t) sxwmData->windowCounts[i]--;
+			}
 			free(c);
 			return;
 		}
