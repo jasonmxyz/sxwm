@@ -6,6 +6,8 @@
 #include <string.h>
 
 extern void tile();
+int running = 1;
+extern int currentTags;
 
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
@@ -16,10 +18,10 @@ void selectTag(int t) {
 	else t = 1 << (t-1);
 
 	// If t is already the currently selected tag, then do nothing.
-	if (t == shared->currentTags) return;
+	if (t == currentTags) return;
 
 	// Set the tag
-	shared->currentTags = t;
+	currentTags = t;
 
 	// Retile the window
 	tile();
@@ -27,7 +29,7 @@ void selectTag(int t) {
 
 // Stops sxwm
 void stop() {
-	shared->running = false;
+	running = false;
 }
 
 // Run a command in a new thread

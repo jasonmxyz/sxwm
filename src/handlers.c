@@ -12,6 +12,7 @@
 extern Display* display;
 extern Window root;
 extern Settings settings;
+extern int currentTags;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -74,14 +75,6 @@ void configureRequest(XEvent e) {
 }
 
 void mapRequest(XEvent e) {
-	// Check whether this is the bar
-	/*XClassHint wclass = {NULL, NULL};
-	XGetClassHint(display, e.xmaprequest.window, &wclass);
-	if (strcmp(wclass.res_name, "sxwm") == 0 && strcmp(wclass.res_class, "sxwm-bar") == 0) {
-		XMapWindow(display, e.xmaprequest.window);
-		return;
-	}*/
-
 	// Copy the attributes of the window to be created, so that we can create a new one
 	// to frame it
 	XWindowAttributes attrs;
@@ -104,7 +97,7 @@ void mapRequest(XEvent e) {
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;
-	newClient->tags = shared->currentTags;
+	newClient->tags = currentTags;
 	addClient(newClient);
 
 	// Reparent and map this window as well as its frame

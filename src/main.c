@@ -14,8 +14,9 @@
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
 
-Shared* shared = NULL;
-Monitor** monitorList = NULL;
+Monitor* monitorList = NULL;
+extern int running;
+int currentTags = 1;
 
 char** g_argv = NULL;
 
@@ -34,15 +35,6 @@ void getMonitors();
 int main(int argc, char** argv) {
 	// Preserve argv
 	g_argv = argv;
-
-	// Allocate a structure to share between this process and the bar
-	shared = malloc(sizeof(Shared));
-	if (shared == NULL) die("Could not allocate memory.");
-	monitorList = &(shared->monitor);
-
-	// Populate the shared structure with some important information to share.
-	shared->currentTags = 1;
-	shared->running = true;
 
 	// Get the command line options
 	char* configFile = NULL;
@@ -110,7 +102,7 @@ int main(int argc, char** argv) {
 		XGrabKey(display, front->keycode, front->modifiers, root, true, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
-	while (shared->running) {
+	while (running) {
 		XEvent e;
 		XNextEvent(display, &e);
 		
@@ -130,10 +122,10 @@ int detectWM(Display* display, XErrorEvent* e) {
 
 // Get information about the display and store it in the monitor structure.
 void getMonitors() {
-	*monitorList = malloc(sizeof(Monitor));
+	monitorList = malloc(sizeof(Monitor));
 
 	int s = DefaultScreen(display);
-	Monitor* monitor = *monitorList;
+	Monitor* monitor = monitorList;
 	monitor->width = DisplayWidth(display, s);
 	monitor->height = DisplayHeight(display, s);
 	monitor->clients = NULL;
