@@ -1,6 +1,7 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
+#include "sxwm.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -10,6 +11,10 @@
 #include <string.h>
 #include <getopt.h>
 #include <libgen.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
 
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
@@ -83,6 +88,13 @@ int main(int argc, char** argv) {
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
 
+	// Create the shared memory
+	int shmFd = createShared(1);
+	if (ftruncate(shmFd, sizeof(SXWMData)) == -1)
+		die("Could not create shared memory.");
+	mapShared(1);
+	DEBUG("Created shared memory.");
+
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.
 	CmdQueue* front = commandQueue;
@@ -110,6 +122,7 @@ int main(int argc, char** argv) {
 	}
 
 	XCloseDisplay(display);
+	shm_unlink(shmName);
 
 	return 0;
 }

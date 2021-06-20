@@ -1,17 +1,17 @@
 CC = gcc
 CFLAGS = -std=gnu11 -g
 DFLAGS = -D VERBOSE
-LIBS = -lX11
+LIBS = -lX11 -lrt
 OBJDIR = obj
 SRCDIR = src
 
 # Code files for the bar and sxwm programs
-BAR = bar util
-SXWM = main clients handlers tile input settings control util
+BAR = bar util shared
+SXWM = main clients handlers tile input settings control util shared
 # Which of the above files should be compiled with the debug flag?
-DEBUG := util bar
+DEBUG =
 
-HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h)
+HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h sxwm.h)
 
 # Find the names of all object files which are to be compiled with or without the debug flag
 DOBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(DEBUG)))
