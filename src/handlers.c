@@ -1,7 +1,6 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
-#include "memory.h"
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -101,7 +100,7 @@ void mapRequest(XEvent e) {
 	XAddToSaveSet(display, e.xmaprequest.window);
 
 	// Add a new client structure to the linked list of all clients
-	Client* newClient = scalloc(sizeof(Client));
+	Client* newClient = calloc(sizeof(Client), 1);
 	newClient->frame = framed;
 	newClient->window = e.xmaprequest.window;
 	newClient->floating = false;

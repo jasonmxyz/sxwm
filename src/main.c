@@ -1,7 +1,6 @@
 #include "util.h"
 #include "clients.h"
 #include "settings.h"
-#include "memory.h"
 
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -36,11 +35,8 @@ int main(int argc, char** argv) {
 	// Preserve argv
 	g_argv = argv;
 
-	// Create the shared memory region and get the location of some data structures within it.
-	createSharedMemory();
-
 	// Allocate a structure to share between this process and the bar
-	shared = smalloc(sizeof(Shared));
+	shared = malloc(sizeof(Shared));
 	if (shared == NULL) die("Could not allocate memory.");
 	monitorList = &(shared->monitor);
 

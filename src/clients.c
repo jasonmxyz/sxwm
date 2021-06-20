@@ -1,6 +1,5 @@
 #include "clients.h"
 #include "util.h"
-#include "memory.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,7 +39,7 @@ void removeClient(Window window) {
 			else monitor->clients = c->next;
 			if (c->next != NULL) (c->next)->previous = c->previous;
 			monitor->clientCount--;
-			sfree(c);
+			free(c);
 			return;
 		}
 	}

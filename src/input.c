@@ -1,7 +1,6 @@
 #include "clients.h"
 #include "util.h"
 #include "settings.h"
-#include "memory.h"
 
 #include <stdio.h>
 #include <unistd.h>
