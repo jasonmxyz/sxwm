@@ -46,7 +46,6 @@ int main(int argc, char** argv) {
 
 	// Populate the shared structure with some important information to share.
 	shared->currentTags = 1;
-	shared->bar = (Window)NULL;
 	shared->running = true;
 
 	// Get the command line options
@@ -109,8 +108,6 @@ int main(int argc, char** argv) {
 
 	// Populate the screen structure with the geometry of the display
 	getMonitors();
-
-	createBar();
 
 	// Grab all the requested keys on the root window
 	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)

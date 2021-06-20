@@ -28,7 +28,6 @@ struct Monitor {
 typedef struct Shared Shared;
 struct Shared {
 	int currentTags;
-	Window bar;
 	bool running;
 	Monitor* monitor;
 };

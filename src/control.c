@@ -1,14 +1,9 @@
 #include "util.h"
 #include "memory.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <X11/Xlib.h>
-#include <stdio.h>
-
-extern Display* display;
 
 extern void tile();
 
@@ -25,13 +20,6 @@ void selectTag(int t) {
 
 	// Set the tag
 	shared->currentTags = t;
-
-	// Send an expose message to the bar if it exists
-	if (shared -> bar != (Window)NULL) {
-		XEvent event;
-		event.type = Expose;
-		XSendEvent(display, shared->bar, true, NoEventMask, &event);
-	}
 
 	// Retile the window
 	tile();

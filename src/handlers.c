@@ -76,12 +76,12 @@ void configureRequest(XEvent e) {
 
 void mapRequest(XEvent e) {
 	// Check whether this is the bar
-	XClassHint wclass = {NULL, NULL};
+	/*XClassHint wclass = {NULL, NULL};
 	XGetClassHint(display, e.xmaprequest.window, &wclass);
 	if (strcmp(wclass.res_name, "sxwm") == 0 && strcmp(wclass.res_class, "sxwm-bar") == 0) {
 		XMapWindow(display, e.xmaprequest.window);
 		return;
-	}
+	}*/
 
 	// Copy the attributes of the window to be created, so that we can create a new one
 	// to frame it
