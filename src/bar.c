@@ -119,7 +119,12 @@ void drawTitle(int xpos) {
 	// Get the title of the window
 	DEBUG("Window: %d", sxwmData->focusedWindow);
 	XTextProperty title;
-	XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False));
-	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, title.value, strlen(title.value));
+	char* name = "Window title unavailable";
+	if (!XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False)))
+		DEBUG("Could not get window title.");
+	else
+		name = title.value;
+	
+	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, name, strlen(name));
 
 }
