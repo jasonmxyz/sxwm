@@ -94,9 +94,9 @@ int main(int argc, char** argv) {
 		die("Could not create shared memory.");
 	mapShared(1);
 	DEBUG("Created shared memory.");
+	memset(sxwmData, 0, sizeof(SXWMData));
 	// Set the value of the variables.
 	sxwmData->currentTags = 1;
-	memset(&(sxwmData->windowCounts), 0, sizeof(int)*sizeof(int)*8);
 	// Copy settings into shared memory for the bar to use
 	memcpy(&(sxwmData->barSettings), &barSettings, sizeof(BarSettings));
 

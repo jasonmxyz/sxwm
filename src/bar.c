@@ -68,6 +68,10 @@ int main(int argc, char** argv) {
 
 void draw() {
 	int xpos = drawTags();
+	
+	XSetForeground(display, gc, sxwmData->barSettings.bgColor1);
+	XFillRectangle(display, sxwmData->barWindow, gc, xpos, 0, width-xpos, sxwmData->barSettings.height);
+
 	drawTitle(xpos);
 }
 
@@ -101,16 +105,19 @@ int drawTags() {
 }
 
 void drawTitle(int xpos) {	
+	DEBUG("Drawing title");
 	XSetForeground(display, gc, sxwmData->barSettings.fgColor1);
 
 	// If there is no focused window, then draw some placeholder text
 	if (!sxwmData->focusedWindow) {
+		DEBUG("Placeholder");
 		const char* msg = "github.com/jasonmxyz/sxwm";
 		XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, msg, strlen(msg));
 		return;
 	}
 
 	// Get the title of the window
+	DEBUG("Window: %d", sxwmData->focusedWindow);
 	XTextProperty title;
 	XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False));
 	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, title.value, strlen(title.value));
