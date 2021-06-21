@@ -12,7 +12,6 @@ extern Display* display;
 extern Window root;
 extern bool running;
 extern KeyCombo* rootKeyCombos;
-extern KeyCombo* clientKeyCombos;
 
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
