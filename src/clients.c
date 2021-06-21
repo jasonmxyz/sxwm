@@ -21,6 +21,12 @@ void addClient(Client* client) {
 		int t = 1 << i;
 		if (client->tags & t) sxwmData->windowCounts[i]++;
 	}
+
+	// Do the same for the focus list
+	if (monitor->focused != NULL) (monitor->focused)->focusPrevious = client;
+	client->focusNext = monitor->focused;
+	monitor->focused = client;
+	sxwmData->focusedWindow = client->window;
 }
 
 // Get the frame window given the client window
@@ -49,6 +55,13 @@ void removeClient(Window window) {
 				int t = 1 << i;
 				if (c->tags & t) sxwmData->windowCounts[i]--;
 			}
+
+			// Update the focus list
+			if (c->focusPrevious != NULL) (c->focusPrevious)->focusNext = c->focusNext;
+			else monitor->focused = c->focusNext;
+			if (c->focusNext != NULL) (c->focusNext)->focusPrevious = c->focusPrevious;
+			sxwmData->focusedWindow = monitor->focused;
+
 			free(c);
 			return;
 		}

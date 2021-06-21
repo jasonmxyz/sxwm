@@ -16,6 +16,7 @@ typedef struct SXWMData SXWMData;
 struct SXWMData {
 	int currentTags;
 	int windowCounts[sizeof(int)*8];
+	Window focusedWindow;
 	Window barWindow;
 	BarSettings barSettings;
 };

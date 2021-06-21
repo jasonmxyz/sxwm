@@ -17,6 +17,8 @@ struct Client {
 	Window window;
 	Client* next;
 	Client* previous;
+	Client* focusNext;
+	Client* focusPrevious;
 	bool floating;
 	int tags;
 	Point floatingLocation;
@@ -27,6 +29,7 @@ typedef struct Monitor Monitor;
 struct Monitor {
 	int width, height;
 	Client* clients;
+	Client* focused;
 	int clientCount;
 };
 
