@@ -86,12 +86,6 @@ void mapRequest(XEvent e) {
 		XMapWindow(display, e.xmaprequest.window);
 		return;
 	}
-	XClassHint wc = {NULL, NULL};
-	XGetClassHint(display, e.xmaprequest.window, &wc);
-	if (strcmp(wc.res_name, "sxwm") == 0 && strcmp(wc.res_class, "sxwm-bar") == 0) {
-		XMapWindow(display, e.xmaprequest.window);
-		return;
-	}
 
 	// Create this window with a border to surround e.xmaprequest.window and save it to
 	// the set of all windows for X

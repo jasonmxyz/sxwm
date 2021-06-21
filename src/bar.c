@@ -31,20 +31,19 @@ int main(int argc, char** argv) {
 	Window root = XDefaultRootWindow(display);
 	
 	width = DisplayWidth(display, DefaultScreen(display));
-	
-	XClassHint wc = {"sxwm", "sxwm-bar"};
-	sxwmData->barWindow = XCreateSimpleWindow(display,
-											  root,
-											  0,
-											  0,
-											  width,
-											  sxwmData->barSettings.height,
-											  0,
-											  sxwmData->barSettings.bgColor1,
-											  sxwmData->barSettings.bgColor1);
+
+	// Set the window attributes and create the window
+	XSetWindowAttributes attrs;
+	attrs.override_redirect = True;
+	attrs.event_mask = ExposureMask;
+	sxwmData->barWindow = XCreateWindow(display, root,
+									0, 0,
+									width, sxwmData->barSettings.height,
+									0,
+									CopyFromParent, CopyFromParent, CopyFromParent,
+									CWOverrideRedirect | CWEventMask, &attrs);
 	DEBUG("Created window.");
-	XSelectInput(display, sxwmData->barWindow, ExposureMask);
-	XSetClassHint(display, sxwmData->barWindow, &wc);
+
 	XMapWindow(display, sxwmData->barWindow);
 	DEBUG("Mapped window.");
 
@@ -57,7 +56,6 @@ int main(int argc, char** argv) {
 			draw();
 		}
 	}
-
 
 	DEBUG("Closing Display.");
 	XCloseDisplay(display);
