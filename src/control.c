@@ -9,6 +9,7 @@
 extern void tile();
 int running = 1;
 extern Display* display;
+extern Monitor* monitorList;
 
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
@@ -23,6 +24,15 @@ void selectTag(int t) {
 
 	// Set the tag
 	sxwmData->currentTags = t;
+
+	// Find the focused window in the tag
+	Window focused = 0;
+	for (Client* front = monitorList->focused; front != NULL; front = front->focusNext)
+		if (front->tags & t) {
+			focused = front->window;
+			break;
+		}
+	sxwmData->focusedWindow = focused;
 
 	// Send an expose message to the bar
 	if (sxwmData->barWindow != 0) {
