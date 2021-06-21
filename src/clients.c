@@ -60,7 +60,7 @@ void removeClient(Window window) {
 			if (c->focusPrevious != NULL) (c->focusPrevious)->focusNext = c->focusNext;
 			else monitor->focused = c->focusNext;
 			if (c->focusNext != NULL) (c->focusNext)->focusPrevious = c->focusPrevious;
-			sxwmData->focusedWindow = monitor->focused;
+			sxwmData->focusedWindow = monitor->focused->window;
 
 			free(c);
 			return;

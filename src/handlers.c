@@ -116,6 +116,13 @@ void mapRequest(XEvent e) {
 	XGrabButton(display, Button3, Mod4Mask ,e.xmaprequest.window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XMapWindow(display, e.xmaprequest.window);
 
+	// Send an expose message to the bar
+	if (sxwmData->barWindow != 0) {
+		XEvent event;
+		event.type = Expose;
+		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+	}
+
 	// Tile the windows
 	tile();
 }
@@ -133,6 +140,13 @@ void unmapNotify(XEvent e) {
 	XDestroyWindow(display, framed);
 	// Remove the client from the linked list
 	removeClient(e.xunmap.window);
+
+	// Send an expose message to the bar
+	if (sxwmData->barWindow != 0) {
+		XEvent event;
+		event.type = Expose;
+		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+	}
 
 	// Tile the windows
 	tile();

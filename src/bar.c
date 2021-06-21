@@ -16,6 +16,7 @@ int width;
 
 void draw();
 int drawTags();
+void drawTitle(int xpos);
 
 int main(int argc, char** argv) {
 	DEBUG("Start of bar process.");
@@ -67,10 +68,7 @@ int main(int argc, char** argv) {
 
 void draw() {
 	int xpos = drawTags();
-
-	const char* msg = "github.com/jasonmxyz/sxwm";
-	XSetForeground(display, gc, sxwmData->barSettings.fgColor1);
-	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, msg, strlen(msg));
+	drawTitle(xpos);
 }
 
 int drawTags() {
@@ -100,4 +98,21 @@ int drawTags() {
 	}
 
 	return xpos;
+}
+
+void drawTitle(int xpos) {	
+	XSetForeground(display, gc, sxwmData->barSettings.fgColor1);
+
+	// If there is no focused window, then draw some placeholder text
+	if (!sxwmData->focusedWindow) {
+		const char* msg = "github.com/jasonmxyz/sxwm";
+		XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, msg, strlen(msg));
+		return;
+	}
+
+	// Get the title of the window
+	XTextProperty title;
+	XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False));
+	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, title.value, strlen(title.value));
+
 }
