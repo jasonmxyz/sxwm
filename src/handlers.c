@@ -6,13 +6,11 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <stdlib.h>
-#include <X11/keysym.h>
 #include <X11/Xutil.h>
 #include <string.h>
 
 extern Display* display;
 extern Window root;
-extern Settings settings;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -87,28 +85,22 @@ void mapRequest(XEvent e) {
 		return;
 	}
 
-	// Create this window with a border to surround e.xmaprequest.window and save it to
-	// the set of all windows for X
-	Window framed = XCreateSimpleWindow(display, root, attrs.x, attrs.y, attrs.width, attrs.height, settings.borderWidth, settings.borderColor, 0xffffff);
-	XSelectInput(display, framed, SubstructureRedirectMask | SubstructureNotifyMask);
+	// Create the client
+	Client* client = calloc(sizeof(Client), 1);
+	client->frame    = 0;
+	client->window   = e.xmaprequest.window;
+	client->floating = 0;
+	client->tags     = sxwmData->currentTags;
+
+	// Create the frame window and reparent the new window within in
+	frameClient(client);
+
+	// Add the window to the save set and map it
 	XAddToSaveSet(display, e.xmaprequest.window);
-
-	// Add a new client structure to the linked list of all clients
-	Client* newClient = calloc(sizeof(Client), 1);
-	newClient->frame = framed;
-	newClient->window = e.xmaprequest.window;
-	newClient->floating = false;
-	newClient->tags = sxwmData->currentTags;
-	addClient(newClient);
-
-	// Reparent and map this window as well as its frame
-	XReparentWindow(display, e.xmaprequest.window, framed, 0, 0);
-	XMapWindow(display, framed);
-	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_c), Mod4Mask | ShiftMask, e.xmaprequest.window, true, GrabModeAsync, GrabModeAsync);
-	XGrabButton(display, Button1, Mod4Mask, e.xmaprequest.window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
-	XGrabButton(display, Button3, Mod4Mask ,e.xmaprequest.window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XMapWindow(display, e.xmaprequest.window);
+
+	// Add the client to the linked list
+	addClient(client);
 
 	// Send an expose message to the bar
 	if (sxwmData->barWindow != 0) {

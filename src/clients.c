@@ -1,4 +1,5 @@
 #include "clients.h"
+#include "settings.h"
 #include "util.h"
 #include "sxwm.h"
 
@@ -6,9 +7,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 extern Display* display;
 extern Monitor* monitorList;
+extern Window root;
+
+extern Settings settings;
+
+// Create a frame window for a given client
+void frameClient(Client* client) {
+	// If the client has a frame window, then remove it.
+	if (client->frame) {
+		die("TODO");
+	}
+
+	// Create the frame window with the same attributes as the client window
+	XWindowAttributes attrs;
+	XGetWindowAttributes(display, client->window, &attrs);
+
+	client->frame = XCreateSimpleWindow(display, root,
+										 attrs.x, attrs.y,
+										 attrs.width, attrs.height,
+										 settings.borderWidth, settings.borderColor, 0xffffff);
+	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask);
+
+	// Reparent the client window within the frame and map the frame
+	XReparentWindow(display, client->window, client->frame, 0, 0);
+	XMapWindow(display, client->frame);
+
+	// Grab the required keys from the frame
+	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, client->window, true, GrabModeAsync, GrabModeAsync);
+	XGrabKey(display, XKeysymToKeycode(display, XK_c), Mod4Mask | ShiftMask, client->window, true, GrabModeAsync, GrabModeAsync);
+	XGrabButton(display, Button1, Mod4Mask, client->window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
+	XGrabButton(display, Button3, Mod4Mask, client->window, true, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
+	
+}
 
 // Add a client to the front of the list
 void addClient(Client* client) {
