@@ -5,7 +5,6 @@
 
 #include <X11/Xlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <X11/keysym.h>
 #include <string.h>
@@ -82,7 +81,7 @@ int main(int argc, char** argv) {
 	// An error should only occur when there is already a window manager running, causing death.
 	XSetErrorHandler(detectWM);
 	XSelectInput(display, root, SubstructureRedirectMask | SubstructureNotifyMask);
-	XSync(display, false);
+	XSync(display, 0);
 
 	// Set the final error handler
 	XSetErrorHandler(errorHandler);
@@ -115,7 +114,7 @@ int main(int argc, char** argv) {
 
 	// Grab all the requested keys on the root window
 	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
-		XGrabKey(display, front->keycode, front->modifiers, root, true, GrabModeAsync, GrabModeAsync);
+		XGrabKey(display, front->keycode, front->modifiers, root, 1, GrabModeAsync, GrabModeAsync);
 	
 	// Infinite message loop
 	while (running) {

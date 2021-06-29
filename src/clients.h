@@ -3,7 +3,6 @@
 #include "util.h"
 
 #include <X11/Xlib.h>
-#include <stdbool.h>
 
 typedef struct Point Point;
 typedef Point Dimension;
@@ -19,7 +18,7 @@ struct Client {
 	Client* previous;
 	Client* focusNext;
 	Client* focusPrevious;
-	bool floating;
+	int floating;
 	int tags;
 	Point floatingLocation;
 };

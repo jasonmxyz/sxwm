@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
 typedef struct Settings Settings;
 struct Settings {
 	int borderWidth;

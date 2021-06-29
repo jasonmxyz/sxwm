@@ -106,7 +106,7 @@ void mapRequest(XEvent e) {
 	if (sxwmData->barWindow != 0) {
 		XEvent event;
 		event.type = Expose;
-		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
 	}
 
 	// Tile the windows
@@ -131,7 +131,7 @@ void unmapNotify(XEvent e) {
 	if (sxwmData->barWindow != 0) {
 		XEvent event;
 		event.type = Expose;
-		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
 	}
 
 	// Tile the windows

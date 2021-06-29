@@ -48,7 +48,7 @@ void keyPress(XEvent e) {
 		// Toggle floating, call the tile method, and bring the window frame to the front
 		if (c->floating) XLowerWindow(display, c->frame);
 		else XRaiseWindow(display, c->frame);
-		c->floating = c->floating ? false : true;
+		c->floating = c->floating ? 0 : 1;
 		tile();
 		return;
 	}
@@ -59,7 +59,7 @@ void keyPress(XEvent e) {
 		XSetErrorHandler(nothingHandler);
 		XSetCloseDownMode(display, DestroyAll);
 		XKillClient(display, c->window);
-		XSync(display, false);
+		XSync(display, 0);
 		XSetErrorHandler(errorHandler);
 		XUngrabServer(display);
 		return;
@@ -104,7 +104,7 @@ void motionNotify(XEvent e) {
 			// Preserve its floating location
 			(c->floatingLocation).x = initialFramedPos.x;
 			(c->floatingLocation).y = initialFramedPos.y;
-			c->floating = true;
+			c->floating = 1;
 			tile();
 		}
 	}
@@ -116,7 +116,7 @@ void motionNotify(XEvent e) {
 		(c->floatingLocation).y = initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root);
 		// Bring the window out of floating mode, and retile the screen if necessary
 		if (!(c->floating)) {
-			c->floating = true;
+			c->floating = 1;
 			tile();
 		}
 	}

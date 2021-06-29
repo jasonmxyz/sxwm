@@ -38,7 +38,7 @@ void selectTag(int t) {
 	if (sxwmData->barWindow != 0) {
 		XEvent event;
 		event.type = Expose;
-		XSendEvent(display, sxwmData->barWindow, true, NoEventMask, &event);
+		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
 	}
 
 	// Retile the window
@@ -47,7 +47,7 @@ void selectTag(int t) {
 
 // Stops sxwm
 void stop() {
-	running = false;
+	running = 0;
 }
 
 // Run a program with execvp
@@ -55,7 +55,7 @@ void startProgram(char* command, int newSession) {
 	int used = 0;
 	int size = 10;
 	char** cmd;
-	bool inQuotes = false;
+	int inQuotes = 0;
 	int argStart = 0;
 
 	cmd = calloc(10, sizeof(char*));
