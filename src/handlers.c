@@ -64,9 +64,9 @@ void configureRequest(XEvent e) {
 	c.stack_mode = e.xconfigurerequest.detail;
 
 	// The window which frames this one also needs to be reconfigured (if it exists)
-	Window frame = getClientFrame(e.xconfigurerequest.window);
-	if (frame != (Window)NULL)
-		XConfigureWindow(display, frame, e.xconfigurerequest.value_mask, &c);
+	Client* client = getClient(e.xconfigurerequest.window, 0);
+	if (client && client->frame)
+		XConfigureWindow(display, client->frame, e.xconfigurerequest.value_mask, &c);
 
 	// Allow the window to be configured
 	XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);

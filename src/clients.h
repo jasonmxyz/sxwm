@@ -33,7 +33,6 @@ struct Monitor {
 };
 
 void addClient(Client* client);
-Window getClientFrame(Window window);
 void removeClient(Client* client);
 Client* getClientByWindow(Window window);
 void frameClient(Client* client);

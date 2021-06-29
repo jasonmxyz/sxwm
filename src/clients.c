@@ -93,19 +93,6 @@ Client* getClient(Window window, int isFrame) {
 	return NULL;
 }
 
-// Get the frame window given the client window
-Window getClientFrame(Window window) {
-	Monitor* monitor = monitorList;
-	Client* current = monitor->clients;
-	while (current != NULL) {
-		if (current->window == window) {
-			return current->frame;
-		}
-		current = current->next;
-	}
-	return (Window)NULL;
-}
-
 // Removes a client its linked lists
 void removeClient(Client* client) {
 	Monitor* monitor = monitorList;
