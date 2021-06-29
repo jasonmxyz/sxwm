@@ -123,10 +123,10 @@ void unmapNotify(XEvent e) {
 	destroyFrame(client);
 
 	// Remove this window from the save set
-	XRemoveFromSaveSet(display, e.xunmap.window);
+	XRemoveFromSaveSet(display, client->window);
 
 	// Remove this client from the linked lists.
-	removeClient(e.xunmap.window);
+	removeClient(client);
 
 	// Send an expose message to the bar
 	if (sxwmData->barWindow != 0) {
