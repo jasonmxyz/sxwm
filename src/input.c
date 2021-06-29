@@ -10,16 +10,12 @@
 
 extern Display* display;
 extern Window root;
-extern bool running;
 extern KeyCombo* rootKeyCombos;
 
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern int nothingHandler(Display* display, XErrorEvent* e);
 
 extern void tile();
-
-extern void selectTag(int t);
-extern void stop();
 
 Point mouseDownPos;
 Point initialFramedPos;

@@ -28,7 +28,6 @@ extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
 extern BarSettings barSettings;
 
-extern void createBar();
 extern void handle(XEvent e);
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern void readSettings(char* path);
