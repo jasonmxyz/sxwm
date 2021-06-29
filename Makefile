@@ -25,7 +25,7 @@ objdir:
 	mkdir -p $(OBJDIR)
 
 clean: objdir
-	rm -f sxwm bar $(OBJDIR)/*
+	rm -f sxwm sxwmbar $(OBJDIR)/*
 
 $(NOBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
 	$(CC) -c -o $@ $< $(CFLAGS)
