@@ -28,7 +28,7 @@ void frameClient(Client* client) {
 										 attrs.x, attrs.y,
 										 attrs.width, attrs.height,
 										 settings.borderWidth, settings.borderColor, 0xffffff);
-	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask);
+	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask);
 
 	// Reparent the client window within the frame and map the frame
 	XReparentWindow(display, client->window, client->frame, 0, 0);

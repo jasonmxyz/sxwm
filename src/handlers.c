@@ -11,6 +11,7 @@
 
 extern Display* display;
 extern Window root;
+extern Monitor* monitorList;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -19,6 +20,7 @@ extern void motionNotify(XEvent e);
 void configureRequest(XEvent e);
 void mapRequest(XEvent e);
 void unmapNotify(XEvent e);
+void enterNotify(XEvent e);
 int nothingHandler(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
 
@@ -43,6 +45,9 @@ void handle(XEvent e) {
 			break;
 		case MotionNotify:
 			motionNotify(e);
+			break;
+		case EnterNotify:
+			enterNotify(e);
 			break;
 		default:
 			break;
@@ -137,6 +142,57 @@ void unmapNotify(XEvent e) {
 
 	// Tile the windows
 	tile();
+}
+
+void enterNotify(XEvent e) {
+	DEBUG("EnterNotify");
+	// Determine the client being entered
+	Client* client = getClient(e.xcrossing.window, 1);
+	Monitor* monitor = monitorList;
+
+	// If this is not a client, then just focus the root window
+	if (!client) {
+		DEBUG(" Not a client");
+		XSetInputFocus(display, root, RevertToPointerRoot, CurrentTime);
+		return;
+	}
+
+	// If this is a client, then bring it to the front of the focus list
+	// Remove it from the focus list
+	if (client->focusPrevious) client->focusPrevious->focusNext = client->focusNext;
+	else monitor->focused = client->focusNext;
+	if (client->focusNext) client->focusNext->focusPrevious = client->focusPrevious;
+	// Add it back at the start
+	client->focusPrevious = NULL;
+	client->focusNext = monitor->focused;
+	if (monitor->focused) monitor->focused->focusPrevious = client;
+	monitor->focused = client;
+	DUMPCLIENTS();
+
+	// Maybe change the border around this window and the previously focused one
+	// to indicate focus (TODO?)
+
+	// Focus the client window
+	// DWM does it like this, and DWM is cool so...
+	XSetInputFocus(display, client->window, RevertToPointerRoot, CurrentTime);
+	XEvent event;
+	event.type = ClientMessage;
+	event.xclient.window = client->window;
+	event.xclient.message_type = XInternAtom(display, "WM_PROTOCOLS", 0);
+	event.xclient.format = 32;
+	event.xclient.data.l[0] = XInternAtom(display, "WM_TAKE_FOCUS", 0);
+	event.xclient.data.l[1] = CurrentTime;
+	XSendEvent(display, client->window, 0, NoEventMask, &event);
+
+	// Update the shared memory
+	sxwmData->focusedWindow = client->window;
+
+	// Send an expose message to the bar
+	if (sxwmData->barWindow != 0) {
+		XEvent event;
+		event.type = Expose;
+		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
+	}
 }
 
 // An error handler which does nothing
