@@ -86,7 +86,7 @@ void mapRequest(XEvent e) {
 	}
 
 	// Create the client
-	Client* client = calloc(sizeof(Client), 1);
+	Client* client = malloc(sizeof(Client));
 	client->frame    = 0;
 	client->window   = e.xmaprequest.window;
 	client->floating = 0;

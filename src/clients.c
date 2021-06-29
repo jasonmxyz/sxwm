@@ -49,6 +49,7 @@ void addClient(Client* client) {
 	Monitor* monitor = monitorList;
 	if (monitor->clients != NULL) (monitor->clients)->previous = client;
 	client->next = monitor->clients;
+	client->previous = NULL;
 	monitor->clients = client;
 	monitor->clientCount++;
 	for (int i = 0; i < sizeof(int)*8; i++) {
@@ -59,6 +60,7 @@ void addClient(Client* client) {
 	// Do the same for the focus list
 	if (monitor->focused != NULL) (monitor->focused)->focusPrevious = client;
 	client->focusNext = monitor->focused;
+	client->focusPrevious = NULL;
 	monitor->focused = client;
 	sxwmData->focusedWindow = client->window;
 }
