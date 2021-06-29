@@ -44,6 +44,16 @@ void frameClient(Client* client) {
 	
 }
 
+// Destroy the frame around a client
+void destroyFrame(Client* client) {
+	// Unmap the frame window and reparent the client window under the root.
+	XUnmapWindow(display, client->frame);
+	XReparentWindow(display, client->window, root, 0, 0);
+
+	// Destroy the frame
+	XDestroyWindow(display, client->frame);
+}
+
 // Add a client to the front of the list
 void addClient(Client* client) {
 	Monitor* monitor = monitorList;
@@ -63,6 +73,26 @@ void addClient(Client* client) {
 	client->focusPrevious = NULL;
 	monitor->focused = client;
 	sxwmData->focusedWindow = client->window;
+}
+
+// Get a client structure given the frame or client window
+Client* getClient(Window window, int isFrame) {
+	Monitor* monitor = monitorList;
+	Client* front = monitor->clients;
+
+	// If we are searching with a frame window
+	if (isFrame) {
+		for (; front != NULL; front = front->next)
+			if (front->frame == window)
+				return front;
+		return NULL;
+	}
+
+	// If we are searching with a client window
+	for (; front != NULL; front = front->next)
+		if (front->window == window)
+			return front;
+	return NULL;
 }
 
 // Get the frame window given the client window

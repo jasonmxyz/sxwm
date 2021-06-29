@@ -114,17 +114,18 @@ void mapRequest(XEvent e) {
 }
 
 void unmapNotify(XEvent e) {
-	// When a window has been unmapped, we need to destory the frame and reparent the
-	// client under the root window. We don't need to do this for the frame itself.
-	Window framed = getClientFrame(e.xunmap.window);
-	if (framed == (Window)NULL) return;
+	// We only need to act if this window is a client window with a frame that
+	// we can destroy.
+	Client* client = getClient(e.xunmap.window, 0);
+	if (!client) return;
 
-	// Reparent the client, and destroy the frame
-	XUnmapWindow(display, framed);
-	XReparentWindow(display, e.xunmap.window, root, 0, 0);
+	// Destroy the frame around this client
+	destroyFrame(client);
+
+	// Remove this window from the save set
 	XRemoveFromSaveSet(display, e.xunmap.window);
-	XDestroyWindow(display, framed);
-	// Remove the client from the linked list
+
+	// Remove this client from the linked lists.
 	removeClient(e.xunmap.window);
 
 	// Send an expose message to the bar
