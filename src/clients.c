@@ -18,9 +18,7 @@ extern Settings settings;
 // Create a frame window for a given client
 void frameClient(Client* client) {
 	// If the client has a frame window, then remove it.
-	if (client->frame) {
-		die("TODO");
-	}
+	if (client->frame) destroyFrame(client);
 
 	// Create the frame window with the same attributes as the client window
 	XWindowAttributes attrs;
