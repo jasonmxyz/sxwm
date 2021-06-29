@@ -37,3 +37,10 @@ void removeClient(Client* client);
 void frameClient(Client* client);
 void destroyFrame(Client* client);
 Client* getClient(Window window, int isFrame);
+
+#ifdef VERBOSE
+#define DUMPCLIENTS() dumpClients()
+void dumpClients();
+#else
+#define DUMPCLIENTS()
+#endif

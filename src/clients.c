@@ -120,3 +120,27 @@ void removeClient(Client* client) {
 	// Free this client structure
 	free(client);
 }
+
+// Dump client data to stdout for debugging
+#ifdef VERBOSE
+void dumpClients() {
+    Monitor* monitor = monitorList;
+
+	printf("Variable | Stacking Order | Focus Order\n\n");
+
+	Client* list1 = monitor->clients;
+	Client* list2 = monitor->focused;
+	while (list1 && list2) {
+		printf("Address:  %10d    | %10d\n", list1 ? list1 : 0, list2 ? list2 : 0);
+		printf("Window:   %10d    | %10d\n", list1 ? list1->window : 0, list2 ? list2->window : 0);
+		printf("Frame:    %10d    | %10d\n", list1 ? list1->frame : 0, list2 ? list2->frame : 0);
+		printf("Next:     %10d    | %10d\n", list1 ? list1->next : 0, list2 ? list2->next : 0);
+		printf("Prevous:  %10d    | %10d\n", list1 ? list1->previous : 0, list2 ? list2->previous : 0);
+		printf("fNext:    %10d    | %10d\n", list1 ? list1->focusNext : 0, list2 ? list2->focusNext : 0);
+		printf("fPrevous: %10d    | %10d\n", list1 ? list1->focusPrevious : 0, list2 ? list2->focusPrevious : 0);
+		printf("\n");
+		list1 = list1 ? list1->next : 0;
+		list2 = list2 ? list2->focusNext : 0;
+	}
+}
+#endif
