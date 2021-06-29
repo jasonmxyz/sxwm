@@ -34,7 +34,6 @@ struct Monitor {
 
 void addClient(Client* client);
 void removeClient(Client* client);
-Client* getClientByWindow(Window window);
 void frameClient(Client* client);
 void destroyFrame(Client* client);
 Client* getClient(Window window, int isFrame);

@@ -120,16 +120,3 @@ void removeClient(Client* client) {
 	// Free this client structure
 	free(client);
 }
-
-// Return the Client* associated with a window
-Client* getClientByWindow(Window window) {
-	Monitor* monitor = monitorList;
-	Client* current = monitor->clients;
-	while (current != NULL) {
-		if (current->window == window) {
-			return current;
-		}
-		current = current->next;
-	}
-	return NULL;
-}

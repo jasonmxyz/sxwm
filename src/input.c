@@ -40,7 +40,7 @@ void keyPress(XEvent e) {
 	}
 	
 	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClientByWindow(e.xkey.window);
+	Client* c = getClient(e.xkey.window, 0);
 	if (c == NULL) return;
 
 	// If the Mod+Space combination was given, we should toggle some window to be floating or not
@@ -68,7 +68,7 @@ void keyPress(XEvent e) {
 
 void buttonPress(XEvent e) {
 	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClientByWindow(e.xbutton.window);
+	Client* c = getClient(e.xbutton.window, 0);
 	if (c == NULL) return;
 	
 	// Get the geometry of the window
@@ -92,7 +92,7 @@ void buttonPress(XEvent e) {
 
 void motionNotify(XEvent e) {
 	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClientByWindow(e.xmotion.window);
+	Client* c = getClient(e.xmotion.window, 0);
 	if (c == NULL) return;
 
 	// If a window is being resized
