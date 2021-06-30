@@ -38,11 +38,11 @@ extern void selectTag(int t);
 extern void stop();
 extern void runCmd(char* command);
 extern void killFocusedWindow();
-fDict rootFunctions[4] = {{"selectTag", selectTag, FDICT_NEEDINT},
+fDict rootFunctions[] = {{"selectTag", selectTag, FDICT_NEEDINT},
 						  {"exit", stop, 0},
 						  {"run", runCmd, FDICT_NEEDSTRING},
-						  {"killWindow", killFocusedWindow, 0}};
-#define RF_COUNT 4 // How many elements there are in the above array
+						  {"killWindow", killFocusedWindow, 0},
+						  {NULL, NULL, 0}};
 
 void keybind(int argc, char** argv);
 void doStmt(int argc, char** argv);
@@ -287,7 +287,7 @@ void keybind(int argc, char** argv) {
 
 	// Find the corresponding command in rootFunctions
 	fDict command = {NULL, NULL, 0};
-	for (int i = 0; i < RF_COUNT; i++)
+	for (int i = 0; rootFunctions[i].name != NULL; i++)
 		if (strcmp(argv[2], rootFunctions[i].name) == 0) {
 			command = rootFunctions[i];
 			break;
