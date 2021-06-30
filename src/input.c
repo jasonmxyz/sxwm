@@ -38,20 +38,6 @@ void keyPress(XEvent e) {
 				return;
 			}
 	}
-	
-	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClient(e.xkey.window, 0);
-	if (c == NULL) return;
-
-	// If the Mod+Space combination was given, we should toggle some window to be floating or not
-	if ((e.xkey.state & Mod4Mask) && (e.xkey.keycode == XKeysymToKeycode(display, XK_space))) {
-		// Toggle floating, call the tile method, and bring the window frame to the front
-		if (c->floating) XLowerWindow(display, c->frame);
-		else XRaiseWindow(display, c->frame);
-		c->floating = c->floating ? 0 : 1;
-		tile();
-		return;
-	}
 }
 
 void buttonPress(XEvent e) {

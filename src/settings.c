@@ -38,10 +38,12 @@ extern void selectTag(int t);
 extern void stop();
 extern void runCmd(char* command);
 extern void killFocusedWindow();
+extern void toggleFloating();
 fDict rootFunctions[] = {{"selectTag", selectTag, FDICT_NEEDINT},
 						  {"exit", stop, 0},
 						  {"run", runCmd, FDICT_NEEDSTRING},
 						  {"killWindow", killFocusedWindow, 0},
+						  {"toggleFloating", toggleFloating, 0},
 						  {NULL, NULL, 0}};
 
 void keybind(int argc, char** argv);

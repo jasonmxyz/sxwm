@@ -30,6 +30,28 @@ void killFocusedWindow() {
 	XUngrabServer(display);
 }
 
+// Toggle the floating state of the focused window
+void toggleFloating() {
+	// Determine the focused client
+	Monitor* monitor = monitorList;
+	Client* focused = monitor->focused;
+
+	if (!focused) {
+		DEBUG("No focused client available.");
+		return;
+	}
+
+	// Toggle the floating status of the window, and raise or lower the window
+	if (focused->floating) XLowerWindow(display, focused->frame);
+	else XRaiseWindow(display, focused->frame);
+	focused->floating = focused->floating ? 0 : 1;
+
+	// Tile the screen
+	tile();
+	
+	return;
+}
+
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
 	// If t is outside the range of possible tags, then do nothing.
