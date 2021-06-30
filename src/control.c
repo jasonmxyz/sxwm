@@ -11,6 +11,20 @@ int running = 1;
 extern Display* display;
 extern Monitor* monitorList;
 
+// Kill the focused client
+void killFocusedWindow() {
+	// Determine the currently focused client
+	Monitor* monitor = monitorList;
+	Client* focused = monitor->focused;
+
+	// Kill the window in that client
+	XGrabServer(display);
+	XSetCloseDownMode(display, DestroyAll);
+	XKillClient(display, focused->window);
+	XSync(display, 0);
+	XUngrabServer(display);
+}
+
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t) {
 	// If t is outside the range of possible tags, then do nothing.

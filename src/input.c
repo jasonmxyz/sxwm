@@ -52,18 +52,6 @@ void keyPress(XEvent e) {
 		tile();
 		return;
 	}
-
-	// If the Mod+Shift+c combination was recieved, we should close some window
-	if ((e.xkey.state & (Mod4Mask | ShiftMask)) && (e.xkey.keycode == XKeysymToKeycode(display, XK_c))) {
-		XGrabServer(display);
-		XSetErrorHandler(nothingHandler);
-		XSetCloseDownMode(display, DestroyAll);
-		XKillClient(display, c->window);
-		XSync(display, 0);
-		XSetErrorHandler(errorHandler);
-		XUngrabServer(display);
-		return;
-	}
 }
 
 void buttonPress(XEvent e) {

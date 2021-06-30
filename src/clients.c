@@ -36,7 +36,6 @@ void frameClient(Client* client) {
 
 	// Grab the required keys from the frame
 	XGrabKey(display, XKeysymToKeycode(display, XK_space), Mod4Mask, client->window, 1, GrabModeAsync, GrabModeAsync);
-	XGrabKey(display, XKeysymToKeycode(display, XK_c), Mod4Mask | ShiftMask, client->window, 1, GrabModeAsync, GrabModeAsync);
 	XGrabButton(display, Button1, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XGrabButton(display, Button3, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	

@@ -13,6 +13,7 @@ bind	win+9	selectTag 9
 bind	win+0	selectTag 0
 
 bind	win+shift+q		exit
+bind	win+shift+c		killWindow
 bind	win+shift+p		run dmenu_run -fn CascadiaCode:size=20
 bind	win+shift+enter	run st
 

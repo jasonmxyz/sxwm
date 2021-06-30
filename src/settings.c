@@ -37,10 +37,12 @@ CmdQueue* commandQueue = NULL;
 extern void selectTag(int t);
 extern void stop();
 extern void runCmd(char* command);
-fDict rootFunctions[3] = {{"selectTag", selectTag, FDICT_NEEDINT},
+extern void killFocusedWindow();
+fDict rootFunctions[4] = {{"selectTag", selectTag, FDICT_NEEDINT},
 						  {"exit", stop, 0},
-						  {"run", runCmd, FDICT_NEEDSTRING}};
-#define RF_COUNT 3 // How many elements there are in the above array
+						  {"run", runCmd, FDICT_NEEDSTRING},
+						  {"killWindow", killFocusedWindow, 0}};
+#define RF_COUNT 4 // How many elements there are in the above array
 
 void keybind(int argc, char** argv);
 void doStmt(int argc, char** argv);
