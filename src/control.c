@@ -17,6 +17,11 @@ void killFocusedWindow() {
 	Monitor* monitor = monitorList;
 	Client* focused = monitor->focused;
 
+	if (!focused) {
+		DEBUG("No focused client to be killed.");
+		return;
+	}
+
 	// Kill the window in that client
 	XGrabServer(display);
 	XSetCloseDownMode(display, DestroyAll);
