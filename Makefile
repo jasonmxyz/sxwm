@@ -3,26 +3,26 @@ CFLAGS = -std=gnu11 -g
 LIBS = -lX11 -lrt
 OBJDIR = obj
 SRCDIR = src
+DEPDIR = dep
 
 # Code files for the bar and sxwm programs
 BAR = bar util shared
 SXWM = main clients handlers tile input settings control util shared
 
-HEADERS := $(addprefix $(SRCDIR)/, util.h clients.h settings.h sxwm.h)
-
-OBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(sort $(BAR) $(SXWM))))
-
-.PHONY: all clean objdir
+.PHONY: all clean
 
 all: sxwm sxwmbar
 
-objdir:
-	mkdir -p $(OBJDIR)
+clean:
+	@-rm -rf sxwm sxwmbar $(OBJDIR) $(DEPDIR)
 
-clean: objdir
-	rm -f sxwm sxwmbar $(OBJDIR)/*
+DEP := $(addprefix $(DEPDIR)/, $(addsuffix .d, $(sort $(BAR) $(SXWM))))
+-include $(DEP)
 
-$(OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(HEADERS) objdir
+$(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@mkdir -p $(@D:$(OBJDIR)%=$(DEPDIR)%)
+	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) -MM -MT $@ $< -MF $(@:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 sxwm: % : $(addprefix $(OBJDIR)/, $(addsuffix .o, $(SXWM)))
