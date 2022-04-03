@@ -1,19 +1,19 @@
-#include "util.h"
 #include "clients.h"
 #include "settings.h"
 #include "sxwm.h"
+#include "util.h"
 
-#include <X11/Xlib.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <X11/keysym.h>
-#include <string.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <libgen.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <X11/keysym.h>
+#include <X11/Xlib.h>
 
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
@@ -35,15 +35,18 @@ extern void startProgram(char* cmd, int newSession);
 int detectWM(Display* display, XErrorEvent* e);
 void getMonitors();
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 	// Preserve argv
 	g_argv = argv;
 
 	// Get the command line options
 	char* configFile = NULL;
-	struct option options[3] = {{"help", no_argument, 0, 'h'},
-								{"config", required_argument, 0, 'c'},
-								{0, 0, 0, 0}};
+	struct option options[3] = {
+		{"help", no_argument, 0, 'h'},
+		{"config", required_argument, 0, 'c'},
+		{0, 0, 0, 0}
+	};
 	int opt;
 	opterr = 0; // Stop getopt from printing errors.
 	// Look through argv for the above options
@@ -91,7 +94,6 @@ int main(int argc, char** argv) {
 	if (ftruncate(shmFd, sizeof(SXWMData)) == -1)
 		die("Could not create shared memory.");
 	mapShared(1);
-	DEBUG("Created shared memory.");
 	memset(sxwmData, 0, sizeof(SXWMData));
 	// Set the value of the variables.
 	sxwmData->currentTags = 1;
@@ -131,13 +133,15 @@ int main(int argc, char** argv) {
 }
 
 // An error handler which dies if there is a window manager already present.
-int detectWM(Display* display, XErrorEvent* e) {
+int detectWM(Display* display, XErrorEvent* e)
+{
 	die("There is already a window manager running on this display.");
 	return 1;
 }
 
 // Get information about the display and store it in the monitor structure.
-void getMonitors() {
+void getMonitors()
+{
 	monitorList = malloc(sizeof(Monitor));
 
 	int s = DefaultScreen(display);

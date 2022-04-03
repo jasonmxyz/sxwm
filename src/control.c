@@ -1,10 +1,9 @@
-#include "util.h"
 #include "clients.h"
 #include "sxwm.h"
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 extern void tile();
 int running = 1;
@@ -12,13 +11,13 @@ extern Display* display;
 extern Monitor* monitorList;
 
 // Kill the focused client
-void killFocusedWindow() {
+void killFocusedWindow()
+{
 	// Determine the currently focused client
 	Monitor* monitor = monitorList;
 	Client* focused = monitor->focused;
 
 	if (!focused) {
-		DEBUG("No focused client to be killed.");
 		return;
 	}
 
@@ -31,13 +30,13 @@ void killFocusedWindow() {
 }
 
 // Toggle the floating state of the focused window
-void toggleFloating() {
+void toggleFloating()
+{
 	// Determine the focused client
 	Monitor* monitor = monitorList;
 	Client* focused = monitor->focused;
 
 	if (!focused) {
-		DEBUG("No focused client available.");
 		return;
 	}
 
@@ -53,7 +52,8 @@ void toggleFloating() {
 }
 
 // Selects the specified tag if possible, and retile the windows if necessary.
-void selectTag(int t) {
+void selectTag(int t)
+{
 	// If t is outside the range of possible tags, then do nothing.
 	if (t < 0 || t > sizeof(int)*8) return;
 
@@ -87,12 +87,14 @@ void selectTag(int t) {
 }
 
 // Stops sxwm
-void stop() {
+void stop()
+{
 	running = 0;
 }
 
 // Run a program with execvp
-void startProgram(char* command, int newSession) {
+void startProgram(char* command, int newSession)
+{
 	int used = 0;
 	int size = 10;
 	char** cmd;
@@ -158,4 +160,5 @@ void startProgram(char* command, int newSession) {
 	for (int i = 0; i < used-1; i++) if (cmd[i] != NULL) free(cmd[i]);
 	free(cmd);
 }
+
 void runCmd(char* command) { startProgram(command, 1); }

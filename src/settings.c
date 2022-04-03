@@ -1,13 +1,13 @@
 #include "settings.h"
-#include "util.h"
 #include "sxwm.h"
+#include "util.h"
 
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/Xlib.h>
 
 // Default settings
 BarSettings barSettings = {
@@ -39,19 +39,22 @@ extern void stop();
 extern void runCmd(char* command);
 extern void killFocusedWindow();
 extern void toggleFloating();
-fDict rootFunctions[] = {{"selectTag", selectTag, FDICT_NEEDINT},
-						  {"exit", stop, 0},
-						  {"run", runCmd, FDICT_NEEDSTRING},
-						  {"killWindow", killFocusedWindow, 0},
-						  {"toggleFloating", toggleFloating, 0},
-						  {NULL, NULL, 0}};
+fDict rootFunctions[] = {
+	{"selectTag", selectTag, FDICT_NEEDINT},
+	{"exit", stop, 0},
+	{"run", runCmd, FDICT_NEEDSTRING},
+	{"killWindow", killFocusedWindow, 0},
+	{"toggleFloating", toggleFloating, 0},
+	{NULL, NULL, 0}
+};
 
 void keybind(int argc, char** argv);
 void doStmt(int argc, char** argv);
 
 extern Display* display;
 
-void readSettings(char* path) {
+void readSettings(char* path)
+{
 	// If the path is not set, then check in some predefined locations for it.
 	// TODO
 	if (path == NULL) die("No configuration file specified.");
@@ -173,7 +176,8 @@ void readSettings(char* path) {
 }
 
 // Add a command to the queue to be run later.
-void doStmt(int argc, char** argv) {
+void doStmt(int argc, char** argv)
+{
 	// Check there are enough arguments
 	if (argc <= 1) die("Not enough arguments for operation \"%s\".", argv[0]);
 
@@ -216,7 +220,8 @@ void doStmt(int argc, char** argv) {
 }
 
 // Add a keybinding to the data structure
-void keybind(int argc, char** argv) {
+void keybind(int argc, char** argv)
+{
 	// Check there are enough arguments
 	if (argc < 3) die("Not enough arguments for operation \"%s\".", argv[0]);
 

@@ -11,7 +11,8 @@ extern Display* display;
 extern Monitor* monitorList;
 
 // Aranges the windows on the screen into the tiling layout
-void tile() {
+void tile()
+{
 	Monitor* monitor = monitorList;
 	// Count the number of non-floating windows
 	int toTile = 0;

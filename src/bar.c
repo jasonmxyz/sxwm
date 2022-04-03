@@ -1,4 +1,3 @@
-#include "util.h"
 #include "sxwm.h"
 
 #include <X11/Xlib.h>
@@ -18,14 +17,13 @@ void draw();
 int drawTags();
 void drawTitle(int xpos);
 
-int main(int argc, char** argv) {
-	DEBUG("Start of bar process.");
+int main(int argc, char** argv)
+{
 	g_argv = argv;
 
 	// Create the shared memory
 	createShared(1);
 	mapShared(1);
-	DEBUG("Connected to shared memory.");
 
 	display = XOpenDisplay(NULL);
 	Window root = XDefaultRootWindow(display);
@@ -37,15 +35,13 @@ int main(int argc, char** argv) {
 	attrs.override_redirect = True;
 	attrs.event_mask = ExposureMask;
 	sxwmData->barWindow = XCreateWindow(display, root,
-									0, 0,
-									width, sxwmData->barSettings.height,
-									0,
-									CopyFromParent, CopyFromParent, CopyFromParent,
-									CWOverrideRedirect | CWEventMask, &attrs);
-	DEBUG("Created window.");
+		0, 0,
+		width, sxwmData->barSettings.height,
+		0,
+		CopyFromParent, CopyFromParent, CopyFromParent,
+		CWOverrideRedirect | CWEventMask, &attrs);
 
 	XMapWindow(display, sxwmData->barWindow);
-	DEBUG("Mapped window.");
 
 	gc = XCreateGC(display, root, 0, NULL);
 
@@ -57,11 +53,9 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	DEBUG("Closing Display.");
 	XCloseDisplay(display);
 
 	shm_unlink(shmName);
-	DEBUG("Unlinked from shared memory.");
 }
 
 void draw() {
@@ -102,27 +96,22 @@ int drawTags() {
 	return xpos;
 }
 
-void drawTitle(int xpos) {	
-	DEBUG("Drawing title");
+void drawTitle(int xpos)
+{
 	XSetForeground(display, gc, sxwmData->barSettings.fgColor1);
 
 	// If there is no focused window, then draw some placeholder text
 	if (!sxwmData->focusedWindow) {
-		DEBUG("Placeholder");
 		const char* msg = "github.com/jasonmxyz/sxwm";
 		XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, msg, strlen(msg));
 		return;
 	}
 
 	// Get the title of the window
-	DEBUG("Window: %d", sxwmData->focusedWindow);
 	XTextProperty title;
 	char* name = "Window title unavailable";
-	if (!XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False)))
-		DEBUG("Could not get window title.");
-	else
+	if (XGetTextProperty(display, sxwmData->focusedWindow, &title, XInternAtom(display, "_NET_WM_NAME", False)))
 		name = title.value;
 	
 	XDrawString(display, sxwmData->barWindow, gc, xpos + 10, 20, name, strlen(name));
-
 }

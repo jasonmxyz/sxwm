@@ -1,7 +1,5 @@
 #pragma once
 
-#include "util.h"
-
 #include <X11/Xlib.h>
 
 typedef struct Point Point;
@@ -37,10 +35,3 @@ void removeClient(Client* client);
 void frameClient(Client* client);
 void destroyFrame(Client* client);
 Client* getClient(Window window, int isFrame);
-
-#ifdef VERBOSE
-#define DUMPCLIENTS() dumpClients()
-void dumpClients();
-#else
-#define DUMPCLIENTS()
-#endif

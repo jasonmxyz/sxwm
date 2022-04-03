@@ -1,13 +1,12 @@
-#include "util.h"
 #include "clients.h"
 #include "settings.h"
 #include "sxwm.h"
 
 #include <stdio.h>
-#include <X11/Xlib.h>
 #include <stdlib.h>
-#include <X11/Xutil.h>
 #include <string.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 extern Display* display;
 extern Window root;
@@ -26,7 +25,8 @@ int errorHandler(Display* display, XErrorEvent* e);
 
 extern void tile();
 
-void handle(XEvent e) {
+void handle(XEvent e)
+{
 	switch (e.type) {
 		case ConfigureRequest:
 			configureRequest(e);
@@ -54,7 +54,8 @@ void handle(XEvent e) {
 	}
 }
 
-void configureRequest(XEvent e) {
+void configureRequest(XEvent e)
+{
 	// Can be recieved multiple times while an application is running, so best not to
 	// do much.
 
@@ -77,7 +78,8 @@ void configureRequest(XEvent e) {
 	XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);
 }
 
-void mapRequest(XEvent e) {
+void mapRequest(XEvent e)
+{
 	// Copy the attributes of the window to be created, so that we can create a new one
 	// to frame it
 	XWindowAttributes attrs;
@@ -118,7 +120,8 @@ void mapRequest(XEvent e) {
 	tile();
 }
 
-void unmapNotify(XEvent e) {
+void unmapNotify(XEvent e)
+{
 	// We only need to act if this window is a client window with a frame that
 	// we can destroy.
 	Client* client = getClient(e.xunmap.window, 0);
@@ -144,15 +147,14 @@ void unmapNotify(XEvent e) {
 	tile();
 }
 
-void enterNotify(XEvent e) {
-	DEBUG("EnterNotify");
+void enterNotify(XEvent e)
+{
 	// Determine the client being entered
 	Client* client = getClient(e.xcrossing.window, 1);
 	Monitor* monitor = monitorList;
 
 	// If this is not a client, then just focus the root window
 	if (!client) {
-		DEBUG(" Not a client");
 		XSetInputFocus(display, root, RevertToPointerRoot, CurrentTime);
 		return;
 	}
@@ -167,7 +169,6 @@ void enterNotify(XEvent e) {
 	client->focusNext = monitor->focused;
 	if (monitor->focused) monitor->focused->focusPrevious = client;
 	monitor->focused = client;
-	DUMPCLIENTS();
 
 	// Maybe change the border around this window and the previously focused one
 	// to indicate focus (TODO?)
@@ -196,9 +197,13 @@ void enterNotify(XEvent e) {
 }
 
 // An error handler which does nothing
-int nothingHandler(Display* display, XErrorEvent* e) { return 0; }
+int nothingHandler(Display* display, XErrorEvent* e)
+{
+	return 0;
+}
 
 // An error handler which does nothing.
-int errorHandler(Display* display, XErrorEvent* e) {
+int errorHandler(Display* display, XErrorEvent* e)
+{
 	return 0;
 }

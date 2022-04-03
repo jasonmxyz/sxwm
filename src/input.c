@@ -1,12 +1,11 @@
 #include "clients.h"
-#include "util.h"
 #include "settings.h"
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <X11/Xlib.h>
+#include <unistd.h>
 #include <X11/keysym.h>
+#include <X11/Xlib.h>
 
 extern Display* display;
 extern Window root;
@@ -21,7 +20,8 @@ Point mouseDownPos;
 Point initialFramedPos;
 Dimension initialFramedSize;
 
-void keyPress(XEvent e) {
+void keyPress(XEvent e)
+{
 	// If the input is on the root window
 	if (e.xkey.window == root) {
 		// Search through the key combination list for the root window
@@ -40,7 +40,8 @@ void keyPress(XEvent e) {
 	}
 }
 
-void buttonPress(XEvent e) {
+void buttonPress(XEvent e)
+{
 	// Get client associated with this window. If there isn't one, then do nothing
 	Client* c = getClient(e.xbutton.window, 0);
 	if (c == NULL) return;
@@ -64,7 +65,8 @@ void buttonPress(XEvent e) {
 	XRaiseWindow(display, c->frame);
 }
 
-void motionNotify(XEvent e) {
+void motionNotify(XEvent e)
+{
 	// Get client associated with this window. If there isn't one, then do nothing
 	Client* c = getClient(e.xmotion.window, 0);
 	if (c == NULL) return;

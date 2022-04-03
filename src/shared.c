@@ -1,30 +1,29 @@
 #include "sxwm.h"
 #include "util.h"
 
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/mman.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 char* shmName = NULL;
 int shmFd;
 SXWMData* sxwmData = NULL;
 
-int createShared(int write) {
+int createShared(int write)
+{
 	// Get the display name from the environment variable
 	char* envDisplay = getenv("DISPLAY");
 	if (envDisplay == NULL) die("Could not determine display name.");
 	int envDisplayLen = strlen(envDisplay);
 	if (envDisplayLen <= 1) die("Invalid display name: %s", envDisplay);
-	DEBUG("Display environment variable: %s. Length: %d", envDisplay, envDisplayLen);
 	
 	// Determine the name of the shm file
 	shmName = malloc(envDisplayLen + 5);
 	if (shmName == NULL) die("Could not allocate memory.");
 	memcpy(shmName, "/sxwm", 5);
 	memcpy(shmName+5, envDisplay+1, envDisplayLen);
-	DEBUG("SHM Name: %s", shmName);
 
 	// Open the shared memory
 	if (write)
@@ -36,7 +35,8 @@ int createShared(int write) {
 	return shmFd;
 }
 
-void mapShared(int write) {
+void mapShared(int write)
+{
 	if (write)
 		sxwmData = mmap(NULL, sizeof(SXWMData), PROT_READ | PROT_WRITE, MAP_SHARED, shmFd, 0);
 	else
@@ -44,6 +44,4 @@ void mapShared(int write) {
 
 	if (sxwmData == MAP_FAILED)
 		die("Could not create shared memory.");
-
-	DEBUG("Mapped memory to virtual address space (%d).", sxwmData);
 }

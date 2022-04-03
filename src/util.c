@@ -24,34 +24,3 @@ void diel(char* fmt, ...) {
 
     exit(1);
 }
-
-#ifdef VERBOSE
-void dief(int line, char* file, char* fmt, ...) {
-    va_list args;
-
-    printf("%s: ", basename(g_argv[0]));
-
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-
-    printf("\n %s at line %d\n", file, line);
-
-    if (shmName != NULL) shm_unlink(shmName);
-
-    exit(1);
-}
-
-void debugf(int line, char* file, char* fmt, ...) {
-    va_list args;
-
-    printf("%s at line %d: ", file, line);
-
-    va_start(args, fmt);
-    vprintf(fmt, args);
-    va_end(args);
-
-    printf("\n");
-}
-
-#endif
