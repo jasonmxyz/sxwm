@@ -8,7 +8,7 @@
 #include <X11/Xlib.h>
 
 extern Display* display;
-extern Monitor* monitorList;
+extern Workspace* workspaceList;
 extern Window root;
 
 extern Settings settings;
@@ -52,30 +52,30 @@ void destroyFrame(Client* client)
 // Add a client to the front of the list
 void addClient(Client* client)
 {
-	Monitor* monitor = monitorList;
-	if (monitor->clients != NULL) (monitor->clients)->previous = client;
-	client->next = monitor->clients;
+	Workspace* workspace = workspaceList;
+	if (workspace->clients != NULL) (workspace->clients)->previous = client;
+	client->next = workspace->clients;
 	client->previous = NULL;
-	monitor->clients = client;
-	monitor->clientCount++;
+	workspace->clients = client;
+	workspace->clientCount++;
 	for (int i = 0; i < sizeof(int)*8; i++) {
 		int t = 1 << i;
 		if (client->tags & t) sxwmData->windowCounts[i]++;
 	}
 
 	// Do the same for the focus list
-	if (monitor->focused != NULL) (monitor->focused)->focusPrevious = client;
-	client->focusNext = monitor->focused;
+	if (workspace->focused != NULL) (workspace->focused)->focusPrevious = client;
+	client->focusNext = workspace->focused;
 	client->focusPrevious = NULL;
-	monitor->focused = client;
+	workspace->focused = client;
 	sxwmData->focusedWindow = client->window;
 }
 
 // Get a client structure given the frame or client window
 Client* getClient(Window window, int isFrame)
 {
-	Monitor* monitor = monitorList;
-	Client* front = monitor->clients;
+	Workspace* workspace = workspaceList;
+	Client* front = workspace->clients;
 
 	// If we are searching with a frame window
 	if (isFrame) {
@@ -95,16 +95,16 @@ Client* getClient(Window window, int isFrame)
 // Removes a client its linked lists
 void removeClient(Client* client)
 {
-	Monitor* monitor = monitorList;
+	Workspace* workspace = workspaceList;
 
 	// Remove this client from the first linked list.
 	if (client->previous) client->previous->next = client->next;
-	else monitor->clients = client->next;
+	else workspace->clients = client->next;
 	if (client->next) client->next->previous = client->previous;
 
 	// Remove this client from the second linked list.
 	if (client->focusPrevious) client->focusPrevious->focusNext = client->focusNext;
-	else monitor->focused = client->focusNext;
+	else workspace->focused = client->focusNext;
 	if (client->focusNext) client->focusNext->focusPrevious = client->focusPrevious;
 
 	// Refresh then shared memory variables
@@ -112,10 +112,10 @@ void removeClient(Client* client)
 		int t = 1 << i;
 		if (client->tags & t) sxwmData->windowCounts[i]--;
 	}
-	if (monitor->focused) sxwmData->focusedWindow = monitor->focused->window;
+	if (workspace->focused) sxwmData->focusedWindow = workspace->focused->window;
 	else sxwmData->focusedWindow = 0;
 
-	monitor->clientCount--;
+	workspace->clientCount--;
 
 	// Free this client structure
 	free(client);

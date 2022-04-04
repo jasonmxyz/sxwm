@@ -24,7 +24,7 @@ struct Options {
 	char *configFile;
 } options;
 
-Monitor* monitorList = NULL;
+Workspace* workspaceList = NULL;
 extern int running;
 
 extern KeyCombo* rootKeyCombos;
@@ -37,7 +37,7 @@ extern void readSettings(char* path);
 extern void startProgram(char* cmd, int newSession);
 
 int detectWM(Display* display, XErrorEvent* e);
-void getMonitors();
+void getWorkspaces();
 
 static void parseCmdLine(int argc, char **argv);
 
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 	}
 
 	// Populate the screen structure with the geometry of the display
-	getMonitors();
+	getWorkspaces();
 
 	// Grab all the requested keys on the root window
 	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
@@ -115,17 +115,17 @@ int detectWM(Display* display, XErrorEvent* e)
 	return 1;
 }
 
-// Get information about the display and store it in the monitor structure.
-void getMonitors()
+// Get information about the display and store it in the workspaces structure.
+void getWorkspaces()
 {
-	monitorList = malloc(sizeof(Monitor));
+	workspaceList = malloc(sizeof(Workspace));
 
 	int s = DefaultScreen(display);
-	Monitor* monitor = monitorList;
-	monitor->width = DisplayWidth(display, s);
-	monitor->height = DisplayHeight(display, s);
-	monitor->clients = NULL;
-	monitor->clientCount = 0;
+	Workspace* workspace = workspaceList;
+	workspace->width = DisplayWidth(display, s);
+	workspace->height = DisplayHeight(display, s);
+	workspace->clients = NULL;
+	workspace->clientCount = 0;
 }
 
 /*

@@ -10,7 +10,7 @@
 
 extern Display* display;
 extern Window root;
-extern Monitor* monitorList;
+extern Workspace* workspaceList;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -151,7 +151,7 @@ void enterNotify(XEvent e)
 {
 	// Determine the client being entered
 	Client* client = getClient(e.xcrossing.window, 1);
-	Monitor* monitor = monitorList;
+	Workspace* workspace = workspaceList;
 
 	// If this is not a client, then just focus the root window
 	if (!client) {
@@ -162,13 +162,13 @@ void enterNotify(XEvent e)
 	// If this is a client, then bring it to the front of the focus list
 	// Remove it from the focus list
 	if (client->focusPrevious) client->focusPrevious->focusNext = client->focusNext;
-	else monitor->focused = client->focusNext;
+	else workspace->focused = client->focusNext;
 	if (client->focusNext) client->focusNext->focusPrevious = client->focusPrevious;
 	// Add it back at the start
 	client->focusPrevious = NULL;
-	client->focusNext = monitor->focused;
-	if (monitor->focused) monitor->focused->focusPrevious = client;
-	monitor->focused = client;
+	client->focusNext = workspace->focused;
+	if (workspace->focused) workspace->focused->focusPrevious = client;
+	workspace->focused = client;
 
 	// Maybe change the border around this window and the previously focused one
 	// to indicate focus (TODO?)

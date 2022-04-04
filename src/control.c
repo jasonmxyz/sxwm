@@ -8,14 +8,14 @@
 extern void tile();
 int running = 1;
 extern Display* display;
-extern Monitor* monitorList;
+extern Workspace* workspaceList;
 
 // Kill the focused client
 void killFocusedWindow()
 {
 	// Determine the currently focused client
-	Monitor* monitor = monitorList;
-	Client* focused = monitor->focused;
+	Workspace* workspace = workspaceList;
+	Client* focused = workspace->focused;
 
 	if (!focused) {
 		return;
@@ -33,8 +33,8 @@ void killFocusedWindow()
 void toggleFloating()
 {
 	// Determine the focused client
-	Monitor* monitor = monitorList;
-	Client* focused = monitor->focused;
+	Workspace* workspace = workspaceList;
+	Client* focused = workspace->focused;
 
 	if (!focused) {
 		return;
@@ -68,7 +68,7 @@ void selectTag(int t)
 
 	// Find the focused window in the tag
 	Window focused = 0;
-	for (Client* front = monitorList->focused; front != NULL; front = front->focusNext)
+	for (Client* front = workspaceList->focused; front != NULL; front = front->focusNext)
 		if (front->tags & t) {
 			focused = front->window;
 			break;

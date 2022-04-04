@@ -8,15 +8,15 @@ extern TileSettings tileSettings;
 extern Settings settings;
 extern BarSettings barSettings;
 extern Display* display;
-extern Monitor* monitorList;
+extern Workspace* workspaceList;
 
 // Aranges the windows on the screen into the tiling layout
 void tile()
 {
-	Monitor* monitor = monitorList;
+	Workspace* workspace = workspaceList;
 	// Count the number of non-floating windows
 	int toTile = 0;
-	for (Client* c = monitor->clients; c != NULL; c=c->next)
+	for (Client* c = workspace->clients; c != NULL; c=c->next)
 		if (!(c->floating) && (c->tags & sxwmData->currentTags)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
@@ -26,20 +26,20 @@ void tile()
 	// Determine the dimensions for master and slave windows
 	int mw, mh, sw, sh;
 	if (tileSettings.masterCount >= toTile) {
-		mw = monitor->width - (2 * tileSettings.gapSize);
-		mh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (toTile + 1))) / toTile);
+		mw = workspace->width - (2 * tileSettings.gapSize);
+		mh = (int)((workspace->height - barSettings.height - (tileSettings.gapSize * (toTile + 1))) / toTile);
 		sw = 0;
 		sh = 0;
 	} else {
-		mw = (monitor->width * tileSettings.masterRatio) - (int)(1.5 * tileSettings.gapSize);
-		mh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (tileSettings.masterCount + 1))) / tileSettings.masterCount);
-		sw = (monitor->width * (1 - tileSettings.masterRatio)) - (int)(1.5 * tileSettings.gapSize);
-		sh = (int)((monitor->height - barSettings.height - (tileSettings.gapSize * (toTile - tileSettings.masterCount + 1))) / (toTile - tileSettings.masterCount));
+		mw = (workspace->width * tileSettings.masterRatio) - (int)(1.5 * tileSettings.gapSize);
+		mh = (int)((workspace->height - barSettings.height - (tileSettings.gapSize * (tileSettings.masterCount + 1))) / tileSettings.masterCount);
+		sw = (workspace->width * (1 - tileSettings.masterRatio)) - (int)(1.5 * tileSettings.gapSize);
+		sh = (int)((workspace->height - barSettings.height - (tileSettings.gapSize * (toTile - tileSettings.masterCount + 1))) / (toTile - tileSettings.masterCount));
 	}
 
 	// Organise the windows
 	int i = 0;
-	for (Client* c = monitor->clients; c != NULL; c=c->next) {
+	for (Client* c = workspace->clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
 		if (!(c->floating) && (c->tags & sxwmData->currentTags)) {
 			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
@@ -55,7 +55,7 @@ void tile()
 		}
 		// Move other windows off the screen
 		else {
-			XMoveWindow(display, c->frame, monitor->width * -2, 0);
+			XMoveWindow(display, c->frame, workspace->width * -2, 0);
 		}
 	}
 }
