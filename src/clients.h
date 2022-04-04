@@ -21,16 +21,6 @@ struct Client {
 	Point floatingLocation;
 };
 
-// A structure to store the dimensions and client list of a workspace
-typedef struct Workspace Workspace;
-struct Workspace {
-	int x, y;
-	int width, height;
-	Client* clients;
-	Client* focused;
-	int clientCount;
-};
-
 void addClient(Client* client);
 void removeClient(Client* client);
 void frameClient(Client* client);

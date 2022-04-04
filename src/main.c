@@ -25,8 +25,11 @@ struct Options {
 	char *configFile;
 } options;
 
-Workspace* workspaceList = NULL;
 extern int running;
+
+/* The currently selected monitor. */
+extern struct Monitor *monitorList;
+struct Monitor *selectedMonitor;
 
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
@@ -36,9 +39,9 @@ extern void handle(XEvent e);
 extern int errorHandler(Display* display, XErrorEvent* e);
 extern void readSettings(char* path);
 extern void startProgram(char* cmd, int newSession);
+extern int detectMonitors();
 
 int detectWM(Display* display, XErrorEvent* e);
-void getWorkspaces();
 
 static void parseCmdLine(int argc, char **argv);
 
@@ -81,6 +84,7 @@ int main(int argc, char** argv)
 	if (detectMonitors() < 0) {
 		die("Failure detecting display setup.");
 	}
+	selectedMonitor = monitorList;
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.
@@ -92,9 +96,6 @@ int main(int argc, char** argv)
 		free(front);
 		front = next;
 	}
-
-	// Populate the screen structure with the geometry of the display
-	getWorkspaces();
 
 	// Grab all the requested keys on the root window
 	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
@@ -119,19 +120,6 @@ int detectWM(Display* display, XErrorEvent* e)
 {
 	die("There is already a window manager running on this display.");
 	return 1;
-}
-
-// Get information about the display and store it in the workspaces structure.
-void getWorkspaces()
-{
-	workspaceList = malloc(sizeof(Workspace));
-
-	int s = DefaultScreen(display);
-	Workspace* workspace = workspaceList;
-	workspace->width = DisplayWidth(display, s);
-	workspace->height = DisplayHeight(display, s);
-	workspace->clients = NULL;
-	workspace->clientCount = 0;
 }
 
 /*

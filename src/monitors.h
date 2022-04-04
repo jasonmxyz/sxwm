@@ -10,6 +10,5 @@ struct Monitor {
 	int height;
 	struct Monitor *prev;
 	struct Monitor *next;
+	struct Workspace *workspaces;
 };
-
-int detectMonitors();

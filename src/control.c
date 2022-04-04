@@ -1,5 +1,7 @@
 #include "clients.h"
+#include "monitors.h"
 #include "sxwm.h"
+#include "workspaces.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -8,13 +10,13 @@
 extern void tile();
 int running = 1;
 extern Display* display;
-extern Workspace* workspaceList;
+extern struct Monitor *selectedMonitor;
 
 // Kill the focused client
 void killFocusedWindow()
 {
 	// Determine the currently focused client
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 	Client* focused = workspace->focused;
 
 	if (!focused) {
@@ -33,7 +35,7 @@ void killFocusedWindow()
 void toggleFloating()
 {
 	// Determine the focused client
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 	Client* focused = workspace->focused;
 
 	if (!focused) {
@@ -54,6 +56,8 @@ void toggleFloating()
 // Selects the specified tag if possible, and retile the windows if necessary.
 void selectTag(int t)
 {
+	struct Workspace *workspace = selectedMonitor->workspaces;
+
 	// If t is outside the range of possible tags, then do nothing.
 	if (t < 0 || t > sizeof(int)*8) return;
 
@@ -68,7 +72,7 @@ void selectTag(int t)
 
 	// Find the focused window in the tag
 	Window focused = 0;
-	for (Client* front = workspaceList->focused; front != NULL; front = front->focusNext)
+	for (Client* front = workspace->focused; front != NULL; front = front->focusNext)
 		if (front->tags & t) {
 			focused = front->window;
 			break;

@@ -1,6 +1,8 @@
 #include "clients.h"
+#include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
+#include "workspaces.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,8 +10,8 @@
 #include <X11/Xlib.h>
 
 extern Display* display;
-extern Workspace* workspaceList;
 extern Window root;
+extern struct Monitor *selectedMonitor;
 
 extern Settings settings;
 
@@ -52,7 +54,7 @@ void destroyFrame(Client* client)
 // Add a client to the front of the list
 void addClient(Client* client)
 {
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 	if (workspace->clients != NULL) (workspace->clients)->previous = client;
 	client->next = workspace->clients;
 	client->previous = NULL;
@@ -74,7 +76,7 @@ void addClient(Client* client)
 // Get a client structure given the frame or client window
 Client* getClient(Window window, int isFrame)
 {
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 	Client* front = workspace->clients;
 
 	// If we are searching with a frame window
@@ -95,7 +97,7 @@ Client* getClient(Window window, int isFrame)
 // Removes a client its linked lists
 void removeClient(Client* client)
 {
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 
 	// Remove this client from the first linked list.
 	if (client->previous) client->previous->next = client->next;

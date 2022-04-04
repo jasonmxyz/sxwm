@@ -1,6 +1,8 @@
 #include "clients.h"
+#include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
+#include "workspaces.h"
 
 #include <stdio.h>
 
@@ -8,12 +10,12 @@ extern TileSettings tileSettings;
 extern Settings settings;
 extern BarSettings barSettings;
 extern Display* display;
-extern Workspace* workspaceList;
+extern struct Monitor *selectedMonitor;
 
 // Aranges the windows on the screen into the tiling layout
 void tile()
 {
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 	// Count the number of non-floating windows
 	int toTile = 0;
 	for (Client* c = workspace->clients; c != NULL; c=c->next)

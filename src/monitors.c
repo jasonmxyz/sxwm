@@ -1,5 +1,6 @@
 #include "monitors.h"
 #include "util.h"
+#include "workspaces.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -8,9 +9,10 @@
 
 extern Display *display;
 extern Window root;
+extern struct WorkspaceDescription *defaultWorkspace;
 
 /* The fist monitor in the list. */
-struct Monitor *monitorList;
+struct Monitor *monitorList = NULL;
 
 static struct Monitor *getSingleMonitor();
 static struct Monitor *getRandRMonitorList();
@@ -46,7 +48,37 @@ int detectMonitors()
 		return -1;
 	}
 
-	/* TODO: Replace existing monitor list with new one. */
+	if (monitorList) {
+		/* TODO: Replace existing monitor list with new one. */
+		errorf("Not yet implimented.");
+		return -1;
+	} else {
+		/* The first time we generate the list, we assign the default
+		 * workspace to each monitor. */
+		for (struct Monitor *m = newList; m; m = m->next) {
+			struct Workspace *newWorkspace;
+			newWorkspace = malloc(sizeof(struct Workspace));
+			if (!newWorkspace) {
+				/* TODO: Free only new monitor memory so we do
+				 * not have to die here. */
+				die("%s", "Could not allocate memory.");
+				return -1;
+			}
+
+			newWorkspace->x = m->x;
+			newWorkspace->y = m->y;
+			newWorkspace->width = m->width;
+			newWorkspace->height = m->height;
+			newWorkspace->clients = NULL;
+			newWorkspace->focused = NULL;
+			newWorkspace->clientCount = 0;
+			newWorkspace->wd = defaultWorkspace;
+			newWorkspace->prev = NULL;
+			newWorkspace->next = NULL;
+
+			m->workspaces = newWorkspace;
+		}
+	}
 
 	monitorList = newList;
 
@@ -95,6 +127,7 @@ static struct Monitor *getSingleMonitor()
 	m->height = XDisplayHeight(display, screen);
 	m->prev = NULL;
 	m->next = NULL;
+	m->workspaces = NULL;
 
 	return m;
 }
@@ -152,6 +185,7 @@ static struct Monitor *getRandRMonitorList()
 		new->height = mons[i].height;
 		new->prev = last;
 		new->next = NULL;
+		new->workspaces = NULL;
 
 		/* Update the previous linked list item. */
 		if (last) {
@@ -171,7 +205,8 @@ static struct Monitor *getRandRMonitorList()
  * data.
  *
  * Used in the event of an error in the getRandRMonitorList function to free
- * the list before calling the fallback function.
+ * the list before calling the fallback function and in detectMonitors to free
+ * unused monitor structures.
  */
 static void freeBlankList(struct Monitor *list)
 {
@@ -182,6 +217,15 @@ static void freeBlankList(struct Monitor *list)
 
 		if (current->name) {
 			free(current->name);
+		}
+
+		/* Free all the workspaces for this monitor. */
+		struct Workspace *workspaces = current->workspaces;
+		while (workspaces) {
+			struct Workspace *currentWorkspace = workspaces;
+			workspaces = currentWorkspace->next;
+
+			free(currentWorkspace);
 		}
 
 		free(current);

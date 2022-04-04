@@ -1,6 +1,8 @@
 #include "clients.h"
+#include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
+#include "workspaces.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +12,7 @@
 
 extern Display* display;
 extern Window root;
-extern Workspace* workspaceList;
+extern struct Monitor *selectedMonitor;
 
 extern void keyPress(XEvent e);
 extern void buttonPress(XEvent e);
@@ -151,7 +153,7 @@ void enterNotify(XEvent e)
 {
 	// Determine the client being entered
 	Client* client = getClient(e.xcrossing.window, 1);
-	Workspace* workspace = workspaceList;
+	struct Workspace *workspace = selectedMonitor->workspaces;
 
 	// If this is not a client, then just focus the root window
 	if (!client) {
