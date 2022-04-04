@@ -1,4 +1,5 @@
 #include "clients.h"
+#include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
 #include "util.h"
@@ -75,6 +76,11 @@ int main(int argc, char** argv)
 	sxwmData->currentTags = 1;
 	// Copy settings into shared memory for the bar to use
 	memcpy(&(sxwmData->barSettings), &barSettings, sizeof(BarSettings));
+
+	/* Generate the monitor list. */
+	if (detectMonitors() < 0) {
+		die("Failure detecting display setup.");
+	}
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.

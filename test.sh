@@ -7,4 +7,4 @@
 # Usage:
 # ./test.sh [OPTION ...]
 
-xinit ./share/xrc $@ -- $(which Xephyr) :1 -ac -br -screen 1280x720
+xinit ./share/xrc $@ -- $(which Xephyr) :1 -screen 1600x600+0+0 +extension RANDR

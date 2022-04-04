@@ -2,9 +2,21 @@
 
 # Simulates some .xinitrc file which would be executed by startx or the display
 # manager. If some argument is given to this script, then it is used as the
-# argument to sxwm, otherwise default arguments are used. 
+# argument to sxwm, otherwise default arguments are used.
+
+# Small delay and noticable message to avoid confusion with Xephyr's error
+# output.
+sleep 0.1
+echo
+echo '### STARTING SXWM ###'
 
 ARGS="-c ./share/defaultconfig"
 [ $1 ] && ARGS=$@
 
-DISPLAY=:1 exec ./sxwm $ARGS
+export DISPLAY=:1
+
+# Split the 1600x600 screen into two 800x600 xrandr monitors.
+xrandr --setmonitor s1 800/0x600/0+0+0 default >/dev/null 2>/dev/null
+xrandr --setmonitor s2 800/0x600/0+800+0 none >/dev/null 2>/dev/null
+
+exec ./sxwm $ARGS

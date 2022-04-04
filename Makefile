@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -std=gnu11 -g
-LIBS = -lX11 -lrt
+LIBS = -lX11 -lXrandr
 OBJDIR = obj
 SRCDIR = src
 DEPDIR = dep
 
 # Code files for the bar and sxwm programs
 BAR = bar util shared
-SXWM = main clients handlers tile input settings control util shared
+SXWM = main clients handlers tile input settings control util shared monitors
 
 .PHONY: all clean
 
