@@ -21,8 +21,6 @@ Window root;             // The root window of this display
 Monitor* monitorList = NULL;
 extern int running;
 
-char** g_argv = NULL;
-
 extern KeyCombo* rootKeyCombos;
 extern CmdQueue* commandQueue;
 extern BarSettings barSettings;
@@ -37,9 +35,6 @@ void getMonitors();
 
 int main(int argc, char** argv)
 {
-	// Preserve argv
-	g_argv = argv;
-
 	// Get the command line options
 	char* configFile = NULL;
 	struct option options[3] = {

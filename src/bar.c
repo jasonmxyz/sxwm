@@ -7,8 +7,6 @@
 #include <sys/mman.h>
 #include <stdio.h>
 
-char** g_argv;
-
 GC gc;
 Display* display;
 int width;
@@ -19,8 +17,6 @@ void drawTitle(int xpos);
 
 int main(int argc, char** argv)
 {
-	g_argv = argv;
-
 	// Create the shared memory
 	createShared(1);
 	mapShared(1);
