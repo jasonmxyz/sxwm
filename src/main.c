@@ -18,6 +18,12 @@
 Display* display;        // The X display to connected to
 Window root;             // The root window of this display
 
+struct Options {
+	int present_help : 1;
+	int present_config : 1;
+	char *configFile;
+} options;
+
 Monitor* monitorList = NULL;
 extern int running;
 
@@ -33,37 +39,12 @@ extern void startProgram(char* cmd, int newSession);
 int detectWM(Display* display, XErrorEvent* e);
 void getMonitors();
 
+static void parseCmdLine(int argc, char **argv);
+
 int main(int argc, char** argv)
 {
-	// Get the command line options
-	char* configFile = NULL;
-	struct option options[3] = {
-		{"help", no_argument, 0, 'h'},
-		{"config", required_argument, 0, 'c'},
-		{0, 0, 0, 0}
-	};
-	int opt;
-	opterr = 0; // Stop getopt from printing errors.
-	// Look through argv for the above options
-	while ((opt = getopt_long(argc, argv, ":hc:", options, NULL)) != -1) {
-		switch (opt) {
-			// If the -h or --help option was given then print a usage statement and exit
-			case 'h':
-				printf("Usage: %s [--help] [--config <FILE>]\n", basename(argv[0]));
-				exit(0);
-			// If a config file is specified, remember the char* in argv
-			case 'c':
-				configFile = optarg;
-				break;
-			// If an unrecognised option was given
-			case '?':
-				die("Unrecognised option %s", argv[optind-1]);
-			case ':':
-				die("Missing argument for %s", argv[optind-1]);
-			default:
-				die("Unknown error while parsing arguments.");
-		}
-	}
+	/* Read the command line arguments. */
+	parseCmdLine(argc, argv);
 
 	// Attempt to open the default display.
 	display = XOpenDisplay(NULL);
@@ -71,7 +52,7 @@ int main(int argc, char** argv)
 		die("Could not connect to X display.");
 
 	// Load the settings into the relevant data structures
-	readSettings(configFile);
+	readSettings(options.configFile);
 
 	root = XDefaultRootWindow(display);
 
@@ -145,4 +126,64 @@ void getMonitors()
 	monitor->height = DisplayHeight(display, s);
 	monitor->clients = NULL;
 	monitor->clientCount = 0;
+}
+
+/*
+ * Print a usage message to the standard output stream.
+ *
+ * The argument `name` should be a pointer to a null terminated string
+ * containing the path to the executable as given to exec.
+ */
+static void printusage(char *name)
+{
+	char *bn = basename(name);
+
+	printf("Usage: %s%s", bn, " [--help] [--config <FILE>]\n");
+}
+
+/*
+ * Parse command line arguments using typical syntax and populate the option
+ * structure with the found options.
+ *
+ * Use the getopt function provided by libc to ensure typical command line
+ * behavior.
+ *
+ *  Calls die (from util.c) on error.
+ */
+static void parseCmdLine(int argc, char **argv)
+{
+	/* Zero-fill the options structure. */
+	memset(&options, 0, sizeof(options));
+
+	/* The options we can detect with getopt. */
+	struct option getopts[3] = {
+		{"help", no_argument, 0, 'h'},
+		{"config", required_argument, 0, 'c'},
+		{0, 0, 0, 0}
+	};
+	
+	int opt;
+	opterr = 0; /* Supress errors from getopt. */
+
+	while ((opt = getopt_long(argc, argv, ":hc:", getopts, NULL)) != -1) {
+	switch (opt) {
+	case 'h': /* -h or --help */
+		printusage(argv[0]);
+		options.present_help = 1;
+		break;
+	case 'c': /* -c or --config */
+		options.present_config = 1;
+		options.configFile = optarg;
+		break;
+	case '?': /* Unrecognised option */
+		die("%s%s", "Unrecognised option ", argv[optind - 1]);
+		return;
+	case ':': /* Option given without an argument. */
+		die("%s%s", "Missing argument for option ", argv[optind - 1]);
+		return;
+	default: /* Something else. */
+		die("%s", "Unknown error while parsing arguments.");
+		return;
+	}
+	}
 }
