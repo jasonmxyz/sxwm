@@ -48,6 +48,8 @@ void die(const char *fmt, ...)
 	if (messagelen < 0) {
 		goto diel_va_end;
 	}
+	va_end(args);
+	va_start(args, fmt);
 	char *message = malloc(messagelen + 1);
 	if (message < 0) {
 		goto diel_va_end;
