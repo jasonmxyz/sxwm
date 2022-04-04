@@ -101,8 +101,17 @@ void die(const char *fmt, ...)
 	va_start(args, fmt);
 	verrorf(fmt, args);
 	va_end(args);
-	
-	if (shmName != NULL) shm_unlink(shmName);
 
 	exit(1);
+}
+
+/*
+ * Things to do before normal process exit. Unlink shared memory object.
+ *
+ * We register this function with atexit(3), it will be called after 'die',
+ * 'exit' or a fatal X11 error is recieved.
+ */
+void cleanup()
+{
+	if (shmName != NULL) shm_unlink(shmName);
 }

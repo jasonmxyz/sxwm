@@ -40,6 +40,7 @@ extern int errorHandler(Display* display, XErrorEvent* e);
 extern void readSettings(char* path);
 extern void startProgram(char* cmd, int newSession);
 extern int detectMonitors();
+extern void cleanup();
 
 int detectWM(Display* display, XErrorEvent* e);
 
@@ -47,6 +48,8 @@ static void parseCmdLine(int argc, char **argv);
 
 int main(int argc, char** argv)
 {
+	atexit(cleanup);
+	
 	/* Read the command line arguments. */
 	parseCmdLine(argc, argv);
 

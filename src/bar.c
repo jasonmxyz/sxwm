@@ -14,9 +14,12 @@ int width;
 void draw();
 int drawTags();
 void drawTitle(int xpos);
+extern void cleanup();
 
 int main(int argc, char** argv)
 {
+	atexit(cleanup);
+	
 	// Create the shared memory
 	createShared(1);
 	mapShared(1);
