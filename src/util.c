@@ -14,13 +14,19 @@
 
 /*
  * Print a formatted message to the standard error stream prepended with the
- * basename of the executable and exit.
+ * basename of the executable given a variable argument list. Analogous to the
+ * vprintf(3) family.
  *
  * Reads the name of the execuatble from /proc/self/cmdline.
- * Detaches the process from the shared memory segment before exiting.
  */
-void die(const char *fmt, ...)
+static void verrorf(const char *fmt, va_list args)
 {
+	/* Copy the va_list because I don't know how to 'restart' it, and we
+	 * need it twice. Both of these lists have been 'started', but we will
+	 * only stop the second one. */
+	va_list args2;
+	va_copy(args2, args);
+
 	int fd = open("/proc/self/cmdline", O_RDONLY);
 	if (fd < 0) {
 		return;
@@ -30,32 +36,16 @@ void die(const char *fmt, ...)
 	 * extract the basename. */
 	char buf[PATH_MAX];
 	if (read(fd, buf, PATH_MAX) < 0) {
-		goto diel_close;
+		goto verrorf_close;
 	}
 	char *bn = basename(buf);
 
-	/* Initialise the argument list. */
-	va_list args;
-	va_start(args, fmt);
-
-	/* Use the format string and arguments to generate a message with
-	 * vsprintf(3) storing a pointer to the result in in *message. The
-	 * first call is used to determine the size of the string, this could
-	 * be replaced with a call to vasprintf(3), but this is not a standard
-	 * C/POSIX function. */
+	/* Determine the length of the formatted message with vsnprintf(3),
+	 * allowing it to only write 1 byte. */
 	char useless;
 	int messagelen = vsnprintf(&useless, 1, fmt, args);
 	if (messagelen < 0) {
-		goto diel_va_end;
-	}
-	va_end(args);
-	va_start(args, fmt);
-	char *message = malloc(messagelen + 1);
-	if (message < 0) {
-		goto diel_va_end;
-	}
-	if (vsprintf(message, fmt, args) < 0) {
-		goto diel_free_message;
+		goto verrorf_close;
 	}
 
 	/* Allocate enough space to store the complete message and copy it
@@ -63,27 +53,54 @@ void die(const char *fmt, ...)
 	int basenamelen = strlen(bn);
 	char *output = malloc(basenamelen + 2 + messagelen + 1);
 	if (output < 0) {
-		goto diel_free_message;
+		goto verrorf_close;
 	}
 
 	memcpy(output, bn, basenamelen);
 	output[basenamelen] = ':';
 	output[basenamelen + 1] = ' ';
-	memcpy(output + basenamelen + 2, message, messagelen);
+	vsprintf(output + basenamelen + 2, fmt, args2);
 	output[basenamelen + 2 + messagelen] = '\n';
 
 	/* Give all of the output in a single call to write(3). */
 	write(2, output, basenamelen + 2 + messagelen + 1);
 
-	/* Clean up allcoated memory and close cmdline file. This probably
-	 * isn't needed as we're just about to exit, but it can't hurt. */
+	/* Clean up allcoated memory and close cmdline file. */
 	free(output);
-diel_free_message:
-	free(message);
-diel_va_end:
-	va_end(args);
-diel_close:
+verrorf_close:
+	va_end(args2);
 	close(fd);
+}
+
+/*
+ * Print a formatted message to the standard error stream prepended with the
+ * basename of the executable.
+ *
+ * Reads the name of the execuatble from /proc/self/cmdline.
+ */
+void errorf(const char *fmt, ...)
+{
+	/* Initialise the argument list and use it to call errorf. */
+	va_list args;
+	va_start(args, fmt);
+	verrorf(fmt, args);
+	va_end(args);
+}
+
+/*
+ * Print a formatted message to the standard error stream prepended with the
+ * basename of the executable and exit.
+ *
+ * Calls 'verrorf' to print the message.
+ * Detaches the process from the shared memory segment before exiting.
+ */
+void die(const char *fmt, ...)
+{
+	/* Initialise the argument list and use it to call errorf. */
+	va_list args;
+	va_start(args, fmt);
+	verrorf(fmt, args);
+	va_end(args);
 	
 	if (shmName != NULL) shm_unlink(shmName);
 
