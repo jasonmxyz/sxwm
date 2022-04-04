@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Simulates some .xinitrc file which would be executed by startx or the display
+# manager. If some argument is given to this script, then it is used as the
+# argument to sxwm, otherwise default arguments are used. 
+
+ARGS="-c ./share/defaultconfig"
+[ $1 ] && ARGS=$@
+
+DISPLAY=:1 exec ./sxwm $ARGS

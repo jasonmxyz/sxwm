@@ -30,6 +30,3 @@ sxwm: % : $(addprefix $(OBJDIR)/, $(addsuffix .o, $(SXWM)))
 
 sxwmbar: % : $(addprefix $(OBJDIR)/, $(addsuffix .o, $(BAR)))
 	$(CC) -o $@ $(LIBS) $^ $(CFLAGS)
-
-test: sxwm sxwmbar
-	xinit ./sxwm -c ./share/defaultconfig -- $$(which Xephyr) :1 -ac -br -screen 1280x720
