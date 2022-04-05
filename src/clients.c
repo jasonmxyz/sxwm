@@ -51,28 +51,6 @@ void destroyFrame(Client* client)
 	XDestroyWindow(display, client->frame);
 }
 
-// Add a client to the front of the list
-void addClient(Client* client)
-{
-	struct Workspace *workspace = selectedMonitor->workspaces;
-	if (workspace->clients != NULL) (workspace->clients)->previous = client;
-	client->next = workspace->clients;
-	client->previous = NULL;
-	workspace->clients = client;
-	workspace->clientCount++;
-	for (int i = 0; i < sizeof(int)*8; i++) {
-		int t = 1 << i;
-		if (client->tags & t) sxwmData->windowCounts[i]++;
-	}
-
-	// Do the same for the focus list
-	if (workspace->focused != NULL) (workspace->focused)->focusPrevious = client;
-	client->focusNext = workspace->focused;
-	client->focusPrevious = NULL;
-	workspace->focused = client;
-	sxwmData->focusedWindow = client->window;
-}
-
 // Get a client structure given the frame or client window
 Client* getClient(Window window, int isFrame)
 {

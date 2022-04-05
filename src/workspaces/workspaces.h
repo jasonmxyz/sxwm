@@ -2,6 +2,8 @@
 
 #include "../clients.h"
 
+#include <X11/Xlib.h>
+
 /* We maintain a linked list of these workspaces on each monitor. */
 struct Workspace {
 	int x;
@@ -23,4 +25,5 @@ struct WorkspaceDescription {
 	char *name;
 	struct WorkspaceDescription *prev;
 	struct WorkspaceDescription *next;
+	void (*newClient)(struct Workspace*, Window);
 };

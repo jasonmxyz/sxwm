@@ -80,36 +80,26 @@ void configureRequest(XEvent e)
 	XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);
 }
 
+/*
+ * We recieve a MapRequest event when a child of some window calls XMapWindow,
+ * but we have select the substructure redirection flag on its parent. We have
+ * only selected substructure redirection on the root window.
+
+ * We give the window to the currently selected workspace. It should not be
+ * possible for a window with the override_redirect flag to appear here. We add
+ * windows to the save set, although it is never used by this program.
+ *
+ * The function at WorkspaceDescription.newClient is responsible for adding the
+ * client to its linked list and creating a reparenting it within some frame if
+ * necessary.
+ */
 void mapRequest(XEvent e)
 {
-	// Copy the attributes of the window to be created, so that we can create a new one
-	// to frame it
-	XWindowAttributes attrs;
-	XGetWindowAttributes(display, e.xmaprequest.window, &attrs);
+	struct Workspace *workspace = selectedMonitor->workspaces;
 
-	// If this is the bar, or another window with the override_redirect flag,
-	// then let it map itself however it likes.
-	if (attrs.override_redirect) {
-		XMapWindow(display, e.xmaprequest.window);
-		return;
-	}
-
-	// Create the client
-	Client* client = malloc(sizeof(Client));
-	client->frame    = 0;
-	client->window   = e.xmaprequest.window;
-	client->floating = 0;
-	client->tags     = sxwmData->currentTags;
-
-	// Create the frame window and reparent the new window within in
-	frameClient(client);
-
-	// Add the window to the save set and map it
 	XAddToSaveSet(display, e.xmaprequest.window);
-	XMapWindow(display, e.xmaprequest.window);
 
-	// Add the client to the linked list
-	addClient(client);
+	workspace->wd->newClient(workspace, e.xmaprequest.window);
 
 	// Send an expose message to the bar
 	if (sxwmData->barWindow != 0) {
@@ -117,9 +107,6 @@ void mapRequest(XEvent e)
 		event.type = Expose;
 		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
 	}
-
-	// Tile the windows
-	tile();
 }
 
 void unmapNotify(XEvent e)
