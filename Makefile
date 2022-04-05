@@ -7,7 +7,7 @@ DEPDIR = dep
 
 # Code files for the bar and sxwm programs
 BAR = bar util shared
-SXWM = main clients handlers tile input settings control util shared monitors workspaces
+SXWM = main clients handlers input settings control util shared monitors workspaces/workspaces workspaces/tiling/tiling
 
 .PHONY: all clean
 

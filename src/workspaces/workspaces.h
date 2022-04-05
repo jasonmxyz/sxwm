@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clients.h"
+#include "../clients.h"
 
 /* We maintain a linked list of these workspaces on each monitor. */
 struct Workspace {
