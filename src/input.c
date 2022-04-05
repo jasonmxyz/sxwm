@@ -16,6 +16,12 @@ extern int nothingHandler(Display* display, XErrorEvent* e);
 
 extern void tile();
 
+typedef struct Point {
+	int x;
+	int y;
+} Point;
+typedef Point Dimension;
+
 Point mouseDownPos;
 Point initialFramedPos;
 Dimension initialFramedSize;
@@ -43,7 +49,7 @@ void keyPress(XEvent e)
 void buttonPress(XEvent e)
 {
 	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClient(e.xbutton.window, 0);
+	struct Client *c = getClient(e.xbutton.window, 0);
 	if (c == NULL) return;
 	
 	// Get the geometry of the window
@@ -68,7 +74,7 @@ void buttonPress(XEvent e)
 void motionNotify(XEvent e)
 {
 	// Get client associated with this window. If there isn't one, then do nothing
-	Client* c = getClient(e.xmotion.window, 0);
+	struct Client *c = getClient(e.xmotion.window, 0);
 	if (c == NULL) return;
 
 	// If a window is being resized
@@ -78,8 +84,8 @@ void motionNotify(XEvent e)
 		XResizeWindow(display, c->window, initialFramedSize.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedSize.y - (mouseDownPos.y - e.xmotion.y_root));
 		if (!(c->floating)) {
 			// Preserve its floating location
-			(c->floatingLocation).x = initialFramedPos.x;
-			(c->floatingLocation).y = initialFramedPos.y;
+			c->floatingx = initialFramedPos.x;
+			c->floatingy = initialFramedPos.y;
 			c->floating = 1;
 			tile();
 		}
@@ -88,8 +94,8 @@ void motionNotify(XEvent e)
 	// If a window was dragged
 	if (e.xmotion.state & Button1Mask) {
 		XMoveWindow(display, c->frame, initialFramedPos.x - (mouseDownPos.x - e.xmotion.x_root), initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root));
-		(c->floatingLocation).x = initialFramedPos.x - (mouseDownPos.x - e.xmotion.x_root);
-		(c->floatingLocation).y = initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root);
+		c->floatingx = initialFramedPos.x - (mouseDownPos.x - e.xmotion.x_root);
+		c->floatingy = initialFramedPos.y - (mouseDownPos.y - e.xmotion.y_root);
 		// Bring the window out of floating mode, and retile the screen if necessary
 		if (!(c->floating)) {
 			c->floating = 1;

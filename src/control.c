@@ -17,7 +17,7 @@ void killFocusedWindow()
 {
 	// Determine the currently focused client
 	struct Workspace *workspace = selectedMonitor->workspaces;
-	Client* focused = workspace->focused;
+	struct Client *focused = workspace->focused;
 
 	if (!focused) {
 		return;
@@ -36,7 +36,7 @@ void toggleFloating()
 {
 	// Determine the focused client
 	struct Workspace *workspace = selectedMonitor->workspaces;
-	Client* focused = workspace->focused;
+	struct Client *focused = workspace->focused;
 
 	if (!focused) {
 		return;
@@ -72,7 +72,7 @@ void selectTag(int t)
 
 	// Find the focused window in the tag
 	Window focused = 0;
-	for (Client* front = workspace->focused; front != NULL; front = front->focusNext)
+	for (struct Client *front = workspace->focused; front != NULL; front = front->focusNext)
 		if (front->tags & t) {
 			focused = front->window;
 			break;

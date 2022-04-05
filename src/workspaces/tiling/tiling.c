@@ -18,7 +18,7 @@ void tile()
 	struct Workspace *workspace = selectedMonitor->workspaces;
 	// Count the number of non-floating windows
 	int toTile = 0;
-	for (Client* c = workspace->clients; c != NULL; c=c->next)
+	for (struct Client *c = workspace->clients; c != NULL; c=c->next)
 		if (!(c->floating) && (c->tags & sxwmData->currentTags)) toTile++;
 	
 	// If there are no windows to tile, then do nothing
@@ -41,7 +41,7 @@ void tile()
 
 	// Organise the windows
 	int i = 0;
-	for (Client* c = workspace->clients; c != NULL; c=c->next) {
+	for (struct Client *c = workspace->clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
 		if (!(c->floating) && (c->tags & sxwmData->currentTags)) {
 			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
@@ -53,7 +53,7 @@ void tile()
 		} 
 		// Put floating windows back where they should be
 		else if (c->tags & sxwmData->currentTags) {
-			XMoveWindow(display, c->frame, (c->floatingLocation).x, (c->floatingLocation).y);
+			XMoveWindow(display, c->frame, c->floatingx, c->floatingy);
 		}
 		// Move other windows off the screen
 		else {

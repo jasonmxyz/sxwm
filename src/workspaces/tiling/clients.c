@@ -17,7 +17,7 @@ extern void tile();
  */
 void newClient(struct Workspace *workspace, Window window)
 {
-	Client *client = malloc(sizeof(Client));
+	struct Client *client = malloc(sizeof(struct Client));
 	client->frame    = 0;
 	client->window   = window;
 	client->floating = 0;

@@ -16,7 +16,7 @@ extern struct Monitor *selectedMonitor;
 extern Settings settings;
 
 // Create a frame window for a given client
-void frameClient(Client* client)
+void frameClient(struct Client *client)
 {
 	// If the client has a frame window, then remove it.
 	if (client->frame) destroyFrame(client);
@@ -41,7 +41,7 @@ void frameClient(Client* client)
 }
 
 // Destroy the frame around a client
-void destroyFrame(Client* client)
+void destroyFrame(struct Client *client)
 {
 	// Unmap the frame window and reparent the client window under the root.
 	XUnmapWindow(display, client->frame);
@@ -52,10 +52,10 @@ void destroyFrame(Client* client)
 }
 
 // Get a client structure given the frame or client window
-Client* getClient(Window window, int isFrame)
+struct Client *getClient(Window window, int isFrame)
 {
 	struct Workspace *workspace = selectedMonitor->workspaces;
-	Client* front = workspace->clients;
+	struct Client *front = workspace->clients;
 
 	// If we are searching with a frame window
 	if (isFrame) {
@@ -73,7 +73,7 @@ Client* getClient(Window window, int isFrame)
 }
 
 // Removes a client its linked lists
-void removeClient(Client* client)
+void removeClient(struct Client *client)
 {
 	struct Workspace *workspace = selectedMonitor->workspaces;
 

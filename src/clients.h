@@ -2,27 +2,20 @@
 
 #include <X11/Xlib.h>
 
-typedef struct Point Point;
-typedef Point Dimension;
-struct Point {
-	int x, y;
-};
-
-typedef struct Client Client;
 struct Client {
 	Window frame;
 	Window window;
-	Client* next;
-	Client* previous;
-	Client* focusNext;
-	Client* focusPrevious;
+	struct Client *next;
+	struct Client *previous;
+	struct Client *focusNext;
+	struct Client *focusPrevious;
 	int floating;
 	int tags;
-	Point floatingLocation;
+	int floatingx;
+	int floatingy;
 };
 
-void addClient(Client* client);
-void removeClient(Client* client);
-void frameClient(Client* client);
-void destroyFrame(Client* client);
-Client* getClient(Window window, int isFrame);
+void removeClient(struct Client *client);
+void frameClient(struct Client *client);
+void destroyFrame(struct Client *client);
+struct Client *getClient(Window window, int isFrame);
