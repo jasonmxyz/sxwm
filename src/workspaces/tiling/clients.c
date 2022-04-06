@@ -1,5 +1,5 @@
 #include "tiling.h"
-#include "../workspaces.h"
+#include "../../workspaces.h"
 #include "../../clients.h"
 #include "../../sxwm.h"
 

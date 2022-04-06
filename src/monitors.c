@@ -1,6 +1,6 @@
 #include "monitors.h"
 #include "util.h"
-#include "workspaces/workspaces.h"
+#include "workspaces.h"
 
 #include <stdlib.h>
 #include <string.h>

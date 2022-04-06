@@ -1,5 +1,5 @@
 #include "tiling/tiling.h"
-#include "workspaces.h"
+#include "../workspaces.h"
 
 struct WorkspaceDescription tiling = {
 	.id = 1,

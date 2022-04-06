@@ -2,7 +2,7 @@
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
-#include "workspaces/workspaces.h"
+#include "workspaces.h"
 
 #include <stdio.h>
 #include <stdlib.h>
