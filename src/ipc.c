@@ -5,40 +5,11 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sxwm.h>
 #include <unistd.h>
 
 int sockfd;
 char socketname[108];
-
-/*
- * Determine the default location of the SXWM socket. Write the path in the
- * destination buffer up to 108 bytes.
- *
- * We combine the name of the default display (from the DISPLAY environment
- * variable) with constant strings to make /tmp/sxwm:X.sock.
- *
- * On success returns 0.
- * On failure returns -1.
- */
-int defaultSocketPath(char *dest)
-{
-	char *displayName = getenv("DISPLAY");
-	if (!displayName) {
-		errorf("Could not determine X11 display name.");
-		return -1;
-	}
-	int displayNameLen = strlen(displayName);
-	if (displayNameLen > 93) {
-		errorf("Display name is too long.");
-		return -1;
-	}
-
-	memcpy(dest, "/tmp/sxwm", 9);
-	memcpy(dest + 9, displayName, displayNameLen);
-	strcpy(dest + 9 + displayNameLen, ".sock");
-
-	return 0;
-}
 
 /*
  * Create a UNIX socket at the given path, or choose a default path based on
@@ -63,7 +34,7 @@ int createSocket(const char *path)
 
 		strcpy(sock.sun_path, path);
 	} else {
-		if (defaultSocketPath(sock.sun_path) < 0) {
+		if (SXWMDefaultSocketPath(sock.sun_path) < 0) {
 			return -1;
 		}
 	}
@@ -117,7 +88,7 @@ int connectSocket(const char *path)
 
 		strcpy(sock.sun_path, path);
 	} else {
-		if (defaultSocketPath(sock.sun_path) < 0) {
+		if (SXWMDefaultSocketPath(sock.sun_path) < 0) {
 			return -1;
 		}
 	}
