@@ -72,8 +72,9 @@ void configureRequest(XEvent e)
 	c.stack_mode = e.xconfigurerequest.detail;
 
 	// The window which frames this one also needs to be reconfigured (if it exists)
-	struct Client *client = getClient(e.xconfigurerequest.window, 0);
-	if (client && client->frame)
+	struct Client *client;
+	int found = getClientWorkspace(e.xconfigurerequest.window, &client, NULL);
+	if (found && client->frame)
 		XConfigureWindow(display, client->frame, e.xconfigurerequest.value_mask, &c);
 
 	// Allow the window to be configured
@@ -113,8 +114,8 @@ void unmapNotify(XEvent e)
 {
 	// We only need to act if this window is a client window with a frame that
 	// we can destroy.
-	struct Client *client = getClient(e.xunmap.window, 0);
-	if (!client) return;
+	struct Client *client;
+	if (getClientWorkspace(e.xunmap.window, &client, NULL) < 0) return;
 
 	// Destroy the frame around this client
 	destroyFrame(client);
@@ -139,7 +140,7 @@ void unmapNotify(XEvent e)
 void enterNotify(XEvent e)
 {
 	// Determine the client being entered
-	struct Client *client = getClient(e.xcrossing.window, 1);
+	struct Client *client = getClient(e.xcrossing.window);
 	struct Workspace *workspace = selectedMonitor->workspaces;
 
 	// If this is not a client, then just focus the root window

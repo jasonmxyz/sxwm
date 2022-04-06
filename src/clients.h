@@ -1,5 +1,7 @@
 #pragma once
 
+#include "workspaces/workspaces.h"
+
 #include <X11/Xlib.h>
 
 struct Client {
@@ -18,4 +20,5 @@ struct Client {
 void removeClient(struct Client *client);
 void frameClient(struct Client *client);
 void destroyFrame(struct Client *client);
-struct Client *getClient(Window window, int isFrame);
+struct Client *getClient(Window window);
+int getClientWorkspace(Window window, struct Client **retClient, struct Workspace **retWorkspace);

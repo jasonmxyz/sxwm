@@ -49,8 +49,8 @@ void keyPress(XEvent e)
 void buttonPress(XEvent e)
 {
 	// Get client associated with this window. If there isn't one, then do nothing
-	struct Client *c = getClient(e.xbutton.window, 0);
-	if (c == NULL) return;
+	struct Client *c;
+	if (getClientWorkspace(e.xbutton.window, &c, NULL) < 0) return;
 	
 	// Get the geometry of the window
 	Window r;// unused variables
@@ -74,8 +74,8 @@ void buttonPress(XEvent e)
 void motionNotify(XEvent e)
 {
 	// Get client associated with this window. If there isn't one, then do nothing
-	struct Client *c = getClient(e.xmotion.window, 0);
-	if (c == NULL) return;
+	struct Client *c;
+	if (getClientWorkspace(e.xbutton.window, &c, NULL) < 0) return;
 
 	// If a window is being resized
 	if (e.xmotion.state & Button3Mask) {
