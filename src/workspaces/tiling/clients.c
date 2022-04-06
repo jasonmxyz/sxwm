@@ -1,8 +1,6 @@
 #include "tiling.h"
-#include "../../clients.h"
-#include "../../frames.h"
 #include "../../sxwm.h"
-#include "../../workspaces.h"
+#include "../../wm.h"
 
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -49,6 +47,44 @@ void newClient(struct Workspace *workspace, Window window)
 	client->focusPrevious = NULL;
 	workspace->focused = client;
 	sxwmData->focusedWindow = client->window;
+
+	// Tile the windows
+	tile();
+}
+
+/*
+ * Remove a client from this workspace.
+ *
+ * This could be used when a window is destroyed, or when a window is moved to
+ * another workspace. Remove the frame around the client, and remove it from
+ * the two linked lists.
+ */
+void removeClient(struct Workspace *workspace, struct Client *client)
+{
+	workspace->fd->destroy(workspace, client);
+
+	/* Remove this client from the first linked list */
+	if (client->previous) client->previous->next = client->next;
+	else workspace->clients = client->next;
+	if (client->next) client->next->previous = client->previous;
+
+	/* Remove this client from the second linked list */
+	if (client->focusPrevious) client->focusPrevious->focusNext = client->focusNext;
+	else workspace->focused = client->focusNext;
+	if (client->focusNext) client->focusNext->focusPrevious = client->focusPrevious;
+
+	// Refresh then shared memory variables
+	for (int i = 0; i < sizeof(int)*8; i++) {
+		int t = 1 << i;
+		if (client->tags & t) sxwmData->windowCounts[i]--;
+	}
+	if (workspace->focused) sxwmData->focusedWindow = workspace->focused->window;
+	else sxwmData->focusedWindow = 0;
+
+	workspace->clientCount--;
+
+	// Free this client structure
+	free(client);
 
 	// Tile the windows
 	tile();

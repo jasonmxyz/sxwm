@@ -1,9 +1,8 @@
 #include "clients.h"
-#include "frames.h"
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
-#include "workspaces.h"
+#include "wm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,8 +24,6 @@ void unmapNotify(XEvent e);
 void enterNotify(XEvent e);
 int nothingHandler(Display* display, XErrorEvent* e);
 int errorHandler(Display* display, XErrorEvent* e);
-
-extern void tile();
 
 void handle(XEvent e)
 {
@@ -111,6 +108,15 @@ void mapRequest(XEvent e)
 	}
 }
 
+/*
+ * We recieve an UnmapNotify event when a window is unmapped, and we selected
+ * the structure notify mode on it, or the substructure notify mode on its
+ * parent. This includes all clients windows, and possibly some windows in the
+ * frames, so we must only act when a client window is unmapped.
+ *
+ * We remove the client from its workspace, which causes its frame to be
+ * removed at the same time, then we remove it from the same set and finish.
+ */
 void unmapNotify(XEvent e)
 {
 	/* We only care about when client windows are unmapped. */
@@ -119,15 +125,9 @@ void unmapNotify(XEvent e)
 	if (getClientWorkspace(e.xunmap.window, &client, &workspace) < 0) {
 		return;
 	}
-
-	/* Destroy the frame around the client. */
-	workspace->fd->destroy(workspace, client);
-
-	// Remove this window from the save set
+	
+	workspace->wd->removeClient(workspace, client);
 	XRemoveFromSaveSet(display, client->window);
-
-	// Remove this client from the linked lists.
-	removeClient(client);
 
 	// Send an expose message to the bar
 	if (sxwmData->barWindow != 0) {
@@ -135,9 +135,6 @@ void unmapNotify(XEvent e)
 		event.type = Expose;
 		XSendEvent(display, sxwmData->barWindow, 1, NoEventMask, &event);
 	}
-
-	// Tile the windows
-	tile();
 }
 
 void enterNotify(XEvent e)

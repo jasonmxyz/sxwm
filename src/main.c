@@ -1,4 +1,3 @@
-#include "clients.h"
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"

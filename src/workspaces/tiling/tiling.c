@@ -1,8 +1,7 @@
-#include "../../clients.h"
 #include "../../monitors.h"
 #include "../../settings.h"
 #include "../../sxwm.h"
-#include "../../workspaces.h"
+#include "../../wm.h"
 
 #include <stdio.h>
 

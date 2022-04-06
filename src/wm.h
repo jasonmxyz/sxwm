@@ -1,9 +1,48 @@
 #pragma once
 
-#include "clients.h"
-#include "workspaces.h"
-
 #include <X11/Xlib.h>
+
+/* We maintain a linked list of these workspaces on each monitor. */
+struct Workspace {
+	int x;
+	int y;
+	int width;
+	int height;
+	struct Client *clients;
+	struct Client *focused;
+	int clientCount;
+	struct WorkspaceDescription *wd;
+	struct FrameDescription *fd;
+	struct Workspace *prev;
+	struct Workspace *next;
+};
+
+/* We maintain a linked list of these structures representing the avialable
+ * types of workspace. */
+struct WorkspaceDescription {
+	int id;
+	char *name;
+	struct WorkspaceDescription *prev;
+	struct WorkspaceDescription *next;
+	void (*newClient)(struct Workspace*, Window);
+	void (*removeClient)(struct Workspace*, struct Client*);
+};
+
+/* The client structure stores the window(s) associated with some client
+ * window, and connects it to other clients in the same workspace by means of
+ * two linked lists. */
+struct Client {
+	Window frame;
+	Window window;
+	struct Client *next;
+	struct Client *previous;
+	struct Client *focusNext;
+	struct Client *focusPrevious;
+	int floating;
+	int tags;
+	int floatingx;
+	int floatingy;
+};
 
 /* We may provide instructions about how to place windows on the screen using
  * this structure. We can ask that the frame or client window be in a location

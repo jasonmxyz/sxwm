@@ -1,5 +1,6 @@
 #include "clients.h"
 #include "settings.h"
+#include "wm.h"
 
 #include <stdio.h>
 #include <stdlib.h>

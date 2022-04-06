@@ -1,6 +1,6 @@
 #include "basicFrame.h"
-#include "../../frames.h"
 #include "../../util.h"
+#include "../../wm.h"
 
 #include <X11/Xlib.h>
 
@@ -88,9 +88,11 @@ void destroy(struct Workspace *workspace, struct Client *client)
 {
 	XUnmapWindow(display, client->window);
 	XReparentWindow(display, client->window, root, 0, 0);
-
-	XUnmapWindow(display, client->frame);
-	XDestroyWindow(display, client->frame);
+	
+	if (client->frame) {
+		XUnmapWindow(display, client->frame);
+		XDestroyWindow(display, client->frame);
+	}
 
 	client->frame = 0;
 }

@@ -2,7 +2,7 @@
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
-#include "workspaces.h"
+#include "wm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,33 +88,4 @@ int getClientWorkspaceAny(Window window, struct Client **retClient, struct Works
 	}
 
 	return -1;
-}
-
-// Removes a client its linked lists
-void removeClient(struct Client *client)
-{
-	struct Workspace *workspace = selectedMonitor->workspaces;
-
-	// Remove this client from the first linked list.
-	if (client->previous) client->previous->next = client->next;
-	else workspace->clients = client->next;
-	if (client->next) client->next->previous = client->previous;
-
-	// Remove this client from the second linked list.
-	if (client->focusPrevious) client->focusPrevious->focusNext = client->focusNext;
-	else workspace->focused = client->focusNext;
-	if (client->focusNext) client->focusNext->focusPrevious = client->focusPrevious;
-
-	// Refresh then shared memory variables
-	for (int i = 0; i < sizeof(int)*8; i++) {
-		int t = 1 << i;
-		if (client->tags & t) sxwmData->windowCounts[i]--;
-	}
-	if (workspace->focused) sxwmData->focusedWindow = workspace->focused->window;
-	else sxwmData->focusedWindow = 0;
-
-	workspace->clientCount--;
-
-	// Free this client structure
-	free(client);
 }

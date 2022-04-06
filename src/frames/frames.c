@@ -1,4 +1,4 @@
-#include "../frames.h"
+#include "../wm.h"
 
 extern void create(struct Workspace *workspace, struct Client *client, struct FrameSizePosHint *hint);
 extern void destroy(struct Workspace *workspace, struct Client *client);

@@ -1,7 +1,6 @@
-#include "frames.h"
 #include "monitors.h"
 #include "util.h"
-#include "workspaces.h"
+#include "wm.h"
 
 #include <stdlib.h>
 #include <string.h>
