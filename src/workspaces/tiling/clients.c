@@ -1,7 +1,8 @@
 #include "tiling.h"
-#include "../../workspaces.h"
 #include "../../clients.h"
+#include "../../frames.h"
 #include "../../sxwm.h"
+#include "../../workspaces.h"
 
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -24,7 +25,10 @@ void newClient(struct Workspace *workspace, Window window)
 	client->tags     = sxwmData->currentTags;
 
 	// Create the frame window and reparent the new window within in
-	frameClient(client);
+	struct FrameSizePosHint l = {
+		10, 10, 10, 10, 600, 600, 600, 600, FRAME_FS | FRAME_FP
+	};
+	workspace->fd->create(workspace, client, &l);
 
 	XMapWindow(display, window);
 

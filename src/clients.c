@@ -49,31 +49,6 @@ int getClientWorkspace(Window window, struct Client **retClient, struct Workspac
 	return -1;
 }
 
-// Create a frame window for a given client
-void frameClient(struct Client *client)
-{
-	// If the client has a frame window, then remove it.
-	if (client->frame) destroyFrame(client);
-
-	// Create the frame window with the same attributes as the client window
-	XWindowAttributes attrs;
-	XGetWindowAttributes(display, client->window, &attrs);
-
-	client->frame = XCreateSimpleWindow(display, root,
-		attrs.x, attrs.y,
-		attrs.width, attrs.height,
-		settings.borderWidth, settings.borderColor, 0xffffff);
-	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask);
-
-	// Reparent the client window within the frame and map the frame
-	XReparentWindow(display, client->window, client->frame, 0, 0);
-	XMapWindow(display, client->frame);
-
-	// Grab the required keys from the frame
-	XGrabButton(display, Button1, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
-	XGrabButton(display, Button3, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
-}
-
 // Destroy the frame around a client
 void destroyFrame(struct Client *client)
 {

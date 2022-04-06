@@ -18,7 +18,6 @@ struct Client {
 };
 
 void removeClient(struct Client *client);
-void frameClient(struct Client *client);
 void destroyFrame(struct Client *client);
 struct Client *getClient(Window window);
 int getClientWorkspace(Window window, struct Client **retClient, struct Workspace **retWorkspace);

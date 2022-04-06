@@ -12,6 +12,7 @@ struct Workspace {
 	struct Client *focused;
 	int clientCount;
 	struct WorkspaceDescription *wd;
+	struct FrameDescription *fd;
 	struct Workspace *prev;
 	struct Workspace *next;
 };

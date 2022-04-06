@@ -1,3 +1,4 @@
+#include "frames.h"
 #include "monitors.h"
 #include "util.h"
 #include "workspaces.h"
@@ -10,6 +11,7 @@
 extern Display *display;
 extern Window root;
 extern struct WorkspaceDescription *defaultWorkspace;
+extern struct FrameDescription *defaultFrame;
 
 /* The fist monitor in the list. */
 struct Monitor *monitorList = NULL;
@@ -72,6 +74,7 @@ int detectMonitors()
 			newWorkspace->clients = NULL;
 			newWorkspace->focused = NULL;
 			newWorkspace->clientCount = 0;
+			newWorkspace->fd = defaultFrame;
 			newWorkspace->wd = defaultWorkspace;
 			newWorkspace->prev = NULL;
 			newWorkspace->next = NULL;
