@@ -67,7 +67,7 @@ void create(struct Workspace *workspace, struct Client *client, struct FrameSize
 	/* Create the frame window and reparent the client within it at the
 	 * correct position. */
 	client->frame = XCreateSimpleWindow(display, root, fx, fy, fw, fh, 0, 0, BF_BG);
-	XSelectInput(display, client->frame, SubstructureRedirectMask | EnterWindowMask);
+	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask);
 
 	/* Reparent the client and map the windows. */
 	XReparentWindow(display, client->window, client->frame, cx, cy);
