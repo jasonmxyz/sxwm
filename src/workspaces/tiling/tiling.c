@@ -43,10 +43,19 @@ void tile()
 	for (struct Client *c = workspace->clients; c != NULL; c=c->next) {
 		// Put tiled windows in the correct place
 		if (!(c->floating) && (c->tags & sxwmData->currentTags)) {
-			XResizeWindow(display, c->frame, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
-			XResizeWindow(display, c->window, i < tileSettings.masterCount ? mw : sw, i < tileSettings.masterCount ? mh : sh);
-			XMoveWindow(display, c->frame, (i < tileSettings.masterCount ? tileSettings.gapSize : mw + (2 * tileSettings.gapSize)) - settings.borderWidth,
-			                                (barSettings.height + (i < tileSettings.masterCount ? (tileSettings.gapSize * (i+1)) + mh*i : (tileSettings.gapSize * (i-tileSettings.masterCount+1)) + sh*(i-tileSettings.masterCount)))) - settings.borderWidth;
+			struct FrameSizePosHint size = {
+				(i < tileSettings.masterCount ? tileSettings.gapSize : mw + (2 * tileSettings.gapSize)) - settings.borderWidth,
+				(barSettings.height + (i < tileSettings.masterCount ? (tileSettings.gapSize * (i+1)) + mh*i : (tileSettings.gapSize * (i-tileSettings.masterCount+1)) + sh*(i-tileSettings.masterCount))) - settings.borderWidth,
+				0,
+				0,
+				i < tileSettings.masterCount ? mw : sw,
+				i < tileSettings.masterCount ? mh : sh,
+				0,
+				0,
+				FRAME_FP | FRAME_FS
+			};
+
+			workspace->fd->moveresize(workspace, c, &size);
 
 			i++;
 		} 

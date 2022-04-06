@@ -1,20 +1,11 @@
 #include "clients.h"
 #include "monitors.h"
-#include "settings.h"
-#include "sxwm.h"
 #include "wm.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <X11/keysym.h>
-#include <X11/Xlib.h>
 
 extern Display* display;
 extern Window root;
-extern struct Monitor *selectedMonitor;
-extern struct Monitor *monitorList;
 
-extern Settings settings;
+extern struct Monitor *monitorList;
 
 /*
  * Get the Client and Workspace associated with some client window. Returns

@@ -70,6 +70,7 @@ struct FrameDescription {
 	struct FrmaeDescription *next;
 	void (*create)(struct Workspace*, struct Client*, struct FrameSizePosHint*);
 	void (*destroy)(struct Workspace*, struct Client*);
+	void (*moveresize)(struct Workspace*, struct Client*, struct FrameSizePosHint*);
 };
 
 /* Bits for the FrameSizePosHint mask variable. */

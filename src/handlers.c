@@ -2,6 +2,7 @@
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
+#include "util.h"
 #include "wm.h"
 
 #include <stdio.h>
@@ -54,29 +55,50 @@ void handle(XEvent e)
 	}
 }
 
+/*
+ * If we recieve a ConfigureRequest event, we will allow the client to
+ * configure itself however it likses (within reason).
+ * 
+ * If the window to be configured is known to us and associated with a client,
+ * we only allow it to change its size and position through the
+ * FrameDescription.moveresize function. We allow any other window to perform
+ * any configuration.
+ */
 void configureRequest(XEvent e)
 {
-	// Can be recieved multiple times while an application is running, so best not to
-	// do much.
-
-	// A structure to indicate no changes being done to the window.
-	XWindowChanges c;
-	c.x = e.xconfigurerequest.x;
-	c.y = e.xconfigurerequest.y;
-	c.width = e.xconfigurerequest.width;
-	c.height = e.xconfigurerequest.height;
-	c.border_width = e.xconfigurerequest.border_width;
-	c.sibling = e.xconfigurerequest.above;
-	c.stack_mode = e.xconfigurerequest.detail;
-
-	// The window which frames this one also needs to be reconfigured (if it exists)
 	struct Client *client;
-	int found = getClientWorkspace(e.xconfigurerequest.window, &client, NULL);
-	if (found && client->frame)
-		XConfigureWindow(display, client->frame, e.xconfigurerequest.value_mask, &c);
+	struct Workspace *workspace;
+	if (getClientWorkspaceAny(e.xconfigurerequest.window, &client, NULL) < 0) {
+		errorf("Unrecognised window requesting configuration.");
+		XWindowChanges c;
+		c.x = e.xconfigurerequest.x;
+		c.y = e.xconfigurerequest.y;
+		c.width = e.xconfigurerequest.width;
+		c.height = e.xconfigurerequest.height;
+		c.border_width = e.xconfigurerequest.border_width;
+		c.sibling = e.xconfigurerequest.above;
+		c.stack_mode = e.xconfigurerequest.detail;
+		XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);
+	}
 
-	// Allow the window to be configured
-	XConfigureWindow(display, e.xconfigurerequest.window, e.xconfigurerequest.value_mask, &c);
+	struct FrameSizePosHint size = {
+		e.xconfigurerequest.x,
+		e.xconfigurerequest.y,
+		e.xconfigurerequest.x,
+		e.xconfigurerequest.y,
+		e.xconfigurerequest.width,
+		e.xconfigurerequest.height,
+		e.xconfigurerequest.width,
+		e.xconfigurerequest.height,
+		0
+	};
+	if (e.xconfigurerequest.window == client->window) {
+		size.mask = FRAME_CP | FRAME_CS;
+	} else {
+		size.mask = FRAME_FP | FRAME_FS;
+	}
+	
+	workspace->fd->moveresize(workspace, client, &size);
 }
 
 /*
