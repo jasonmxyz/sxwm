@@ -5,3 +5,4 @@
  */
 
 int SXWMDefaultSocketPath(char *buffer);
+int SXWMConnectSocket(const char *path);
