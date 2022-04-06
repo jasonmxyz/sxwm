@@ -18,5 +18,5 @@ struct Client {
 };
 
 void removeClient(struct Client *client);
-struct Client *getClient(Window window);
 int getClientWorkspace(Window window, struct Client **retClient, struct Workspace **retWorkspace);
+int getClientWorkspaceAny(Window window, struct Client **retClient, struct Workspace **retWorkspace);

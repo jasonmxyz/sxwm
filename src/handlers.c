@@ -142,13 +142,11 @@ void unmapNotify(XEvent e)
 
 void enterNotify(XEvent e)
 {
-	// Determine the client being entered
-	struct Client *client = getClient(e.xcrossing.window);
-	struct Workspace *workspace = selectedMonitor->workspaces;
-
-	// If this is not a client, then just focus the root window
-	if (!client) {
-		XSetInputFocus(display, root, RevertToPointerRoot, CurrentTime);
+	/* Find the corresponding client and workspace. */
+	struct Client *client;
+	struct Workspace *workspace;
+	if (getClientWorkspaceAny(e.xcrossing.window, &client, &workspace) < 0) {
+		/* If we are not focusing on a client, then do nothing. */
 		return;
 	}
 

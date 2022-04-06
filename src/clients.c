@@ -18,7 +18,7 @@ extern Settings settings;
 
 /*
  * Get the Client and Workspace associated with some client window. Returns
- * pointer to the client and workspace structures in the provided fields if
+ * pointers to the client and workspace structures in the provided fields if
  * they are found.
  *
  * Searches every workspace for a client with the given window - only checks
@@ -49,16 +49,45 @@ int getClientWorkspace(Window window, struct Client **retClient, struct Workspac
 	return -1;
 }
 
-// Get a client structure given the frame or client window
-struct Client *getClient(Window window)
+/*
+ * Get the Client and Workspace associated with some window. Returns pointers
+ * to the client and workspace structures in the provided fields if they are
+ * found.
+ *
+ * Searches every workspace for a client with the given window. If retClient
+ * or retWorkspace is null, it is not accessed.
+ *
+ * On success returns 0 and stores the pointers in retClient and retWorkspace.
+ * On failure returns -1.
+ */
+int getClientWorkspaceAny(Window window, struct Client **retClient, struct Workspace **retWorkspace)
 {
-	struct Workspace *workspace = selectedMonitor->workspaces;
-	struct Client *front = workspace->clients;
+	for (struct Monitor *m = monitorList; m; m = m->next) {
+		for (struct Workspace *w = m->workspaces; w; w = w->next) {
+			for (struct Client *c = w->clients; c; c = c->next) {
+				if (c->window == window) {
+					if (retClient) {
+						*retClient = c;
+					}
+					if (retWorkspace) {
+						*retWorkspace = w;
+					}
+					return 0;
+				}
+				if (c->frame == window) {
+					if (retClient) {
+						*retClient = c;
+					}
+					if (retWorkspace) {
+						*retWorkspace = w;
+					}
+					return 0;
+				}
+			}
+		}
+	}
 
-	for (; front != NULL; front = front->next)
-		if (front->frame == window)
-			return front;
-	return NULL;
+	return -1;
 }
 
 // Removes a client its linked lists
