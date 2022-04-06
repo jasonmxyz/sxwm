@@ -3,6 +3,7 @@
 #include "sxwm.h"
 #include "util.h"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
 #include <libgen.h>
@@ -50,6 +51,9 @@ int detectWM(Display* display, XErrorEvent* e);
 
 static void parseCmdLine(int argc, char **argv);
 
+int nclients = 0;
+int clients[5] = {0, 0, 0, 0, 0};
+
 int main(int argc, char** argv)
 {
 	atexit(cleanup);
@@ -61,6 +65,9 @@ int main(int argc, char** argv)
 	display = XOpenDisplay(NULL);
 	if (display == NULL)
 		die("Could not connect to X display.");
+	
+	/* Get the file descriptor for the server. */
+	int xfd = XConnectionNumber(display);
 	
 	/* Create the socket so we can listen for connections. */
 	if (createSocket(options.socketFile) < 0) {
@@ -99,7 +106,9 @@ int main(int argc, char** argv)
 	selectedMonitor = monitorList;
 
 	/* Begin listening on the socket. */
-	listen(sockfd, 5);
+	if (listen(sockfd, 5) < 0) {
+		die("Could not listen on socket: %s", strerror(errno));
+	}
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.
@@ -116,12 +125,55 @@ int main(int argc, char** argv)
 	for (KeyCombo* front = rootKeyCombos; front != NULL; front = front->next)
 		XGrabKey(display, front->keycode, front->modifiers, root, 1, GrabModeAsync, GrabModeAsync);
 	
-	// Infinite message loop
+	/* Wait for the either messages from the display server, or from our
+	 * socket/a client. */
+	fd_set readSet;
 	while (running) {
-		XEvent e;
-		XNextEvent(display, &e);
+		/* Create the set of file descriptors to wait for. */
+		int highest = 0;
+		FD_ZERO(&readSet);
+		FD_SET(xfd, &readSet);
+		highest = xfd;
+		FD_SET(sockfd, &readSet);
+		highest = sockfd > highest ? sockfd : highest;
+		for (int i = 0; i < nclients; i++) {
+			FD_SET(clients[i], &readSet);
+			highest = clients[i] > highest ? clients[i] : highest;
+		}
 		
-		handle(e);
+		/* Blocks until we can do something. */
+		if (select(highest + 1, &readSet, NULL, NULL, NULL) < 0) {
+			errorf("Select failed: %s", strerror(errno));
+			continue;
+		}
+
+		/* If we can read from the file descriptor in 'display', then
+		 * there is an event we can read from it. */
+		if (FD_ISSET(xfd, &readSet)) {
+			XEvent e;
+			XNextEvent(display, &e);
+
+			handle(e);
+		}
+
+		/* If we can read from 'sockfd' then there is a client waiting
+		 * to be connected, we can call accept(2). */
+		if (FD_ISSET(sockfd, &readSet)) {
+			int fd = accept(sockfd, NULL, NULL);
+			if (fd < 0) {
+				errorf("Could not accept socket connection: %s", strerror(errno));
+			} else {
+				clients[nclients++] = fd;
+			}
+		}
+
+		/* If we can read from a file descriptor in 'clients', then it
+		 * is possible to call recv(2). */
+		for (int i = 0; i < nclients; i++) {
+			if (FD_ISSET(clients[i], &readSet)) {
+				errorf("Recieved data from client %d (NYI)", i);
+			}
+		}
 	}
 
 	XCloseDisplay(display);

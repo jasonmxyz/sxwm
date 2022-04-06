@@ -1,10 +1,12 @@
 #include "sxwm.h"
+#include "util.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
 #include <stdio.h>
 
 GC gc;
@@ -15,10 +17,17 @@ void draw();
 int drawTags();
 void drawTitle(int xpos);
 extern void cleanup();
+extern int connectSocket(const char *path);
 
 int main(int argc, char** argv)
 {
 	atexit(cleanup);
+
+	/* Connect to the window manager. */
+	int fd = connectSocket(NULL);
+	if (fd <= 0) {
+		die("Could not connect to window manager.");
+	}
 	
 	// Create the shared memory
 	createShared(1);
