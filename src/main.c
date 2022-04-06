@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <X11/keysym.h>
@@ -21,10 +22,13 @@ Window root;             // The root window of this display
 struct Options {
 	int present_help : 1;
 	int present_config : 1;
+	int present_socket : 1;
 	char *configFile;
+	char *socketFile;
 } options;
 
 extern int running;
+extern int sockfd;
 
 /* The currently selected monitor. */
 extern struct Monitor *monitorList;
@@ -40,6 +44,7 @@ extern void readSettings(char* path);
 extern void startProgram(char* cmd, int newSession);
 extern int detectMonitors();
 extern void cleanup();
+extern int createSocket(const char *path);
 
 int detectWM(Display* display, XErrorEvent* e);
 
@@ -56,6 +61,11 @@ int main(int argc, char** argv)
 	display = XOpenDisplay(NULL);
 	if (display == NULL)
 		die("Could not connect to X display.");
+	
+	/* Create the socket so we can listen for connections. */
+	if (createSocket(options.socketFile) < 0) {
+		die("Could not create UNIX socket.");
+	}
 
 	// Load the settings into the relevant data structures
 	readSettings(options.configFile);
@@ -87,6 +97,9 @@ int main(int argc, char** argv)
 		die("Failure detecting display setup.");
 	}
 	selectedMonitor = monitorList;
+
+	/* Begin listening on the socket. */
+	listen(sockfd, 5);
 
 	// Run all of the commands from the command queue in new processes, and free up the memory used
 	// by the queue and the command strings inside it.
@@ -134,7 +147,7 @@ static void printusage(char *name)
 {
 	char *bn = basename(name);
 
-	printf("Usage: %s%s", bn, " [--help] [--config <FILE>]\n");
+	printf("Usage: %s%s", bn, " [--help] [--config <FILE>] [--socket <FILE>]\n");
 }
 
 /*
@@ -152,16 +165,17 @@ static void parseCmdLine(int argc, char **argv)
 	memset(&options, 0, sizeof(options));
 
 	/* The options we can detect with getopt. */
-	struct option getopts[3] = {
+	struct option getopts[4] = {
 		{"help", no_argument, 0, 'h'},
 		{"config", required_argument, 0, 'c'},
+		{"socket", required_argument, 0, 's'},
 		{0, 0, 0, 0}
 	};
 	
 	int opt;
 	opterr = 0; /* Supress errors from getopt. */
 
-	while ((opt = getopt_long(argc, argv, ":hc:", getopts, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, ":hc:s:", getopts, NULL)) != -1) {
 	switch (opt) {
 	case 'h': /* -h or --help */
 		printusage(argv[0]);
@@ -170,6 +184,10 @@ static void parseCmdLine(int argc, char **argv)
 	case 'c': /* -c or --config */
 		options.present_config = 1;
 		options.configFile = optarg;
+		break;
+	case 's': /* -s or --socket */
+		options.present_socket = 1;
+		options.socketFile = optarg;
 		break;
 	case '?': /* Unrecognised option */
 		die("%s%s", "Unrecognised option ", argv[optind - 1]);

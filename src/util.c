@@ -1,5 +1,5 @@
-#include "util.h"
 #include "sxwm.h"
+#include "util.h"
 
 #include <fcntl.h>
 #include <libgen.h>
@@ -11,6 +11,9 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+extern int sockfd;
+extern char socketname[108];
 
 /*
  * Print a formatted message to the standard error stream prepended with the
@@ -114,4 +117,9 @@ void die(const char *fmt, ...)
 void cleanup()
 {
 	if (shmName != NULL) shm_unlink(shmName);
+
+	if (sockfd) {
+		unlink(socketname);
+		close(sockfd);
+	}
 }
