@@ -30,8 +30,6 @@ void newClient(struct Workspace *workspace, Window window)
 	};
 	workspace->fd->create(workspace, client, &l);
 
-	XMapWindow(display, window);
-
 	// Add the client to the linked list
 	if (workspace->clients) (workspace->clients)->previous = client;
 	client->next = workspace->clients;

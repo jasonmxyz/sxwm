@@ -1,4 +1,5 @@
 #include "clients.h"
+#include "frames.h"
 #include "monitors.h"
 #include "settings.h"
 #include "sxwm.h"
@@ -112,13 +113,15 @@ void mapRequest(XEvent e)
 
 void unmapNotify(XEvent e)
 {
-	// We only need to act if this window is a client window with a frame that
-	// we can destroy.
+	/* We only care about when client windows are unmapped. */
 	struct Client *client;
-	if (getClientWorkspace(e.xunmap.window, &client, NULL) < 0) return;
+	struct Workspace *workspace;
+	if (getClientWorkspace(e.xunmap.window, &client, &workspace) < 0) {
+		return;
+	}
 
-	// Destroy the frame around this client
-	destroyFrame(client);
+	/* Destroy the frame around the client. */
+	workspace->fd->destroy(workspace, client);
 
 	// Remove this window from the save set
 	XRemoveFromSaveSet(display, client->window);

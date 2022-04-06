@@ -67,14 +67,30 @@ void create(struct Workspace *workspace, struct Client *client, struct FrameSize
 	/* Create the frame window and reparent the client within it at the
 	 * correct position. */
 	client->frame = XCreateSimpleWindow(display, root, fx, fy, fw, fh, 0, 0, BF_BG);
-	XSelectInput(display, client->frame, SubstructureRedirectMask | SubstructureNotifyMask | EnterWindowMask);
+	XSelectInput(display, client->frame, SubstructureRedirectMask | EnterWindowMask);
 
-	/* Reparent the client and map the frame. */
+	/* Reparent the client and map the windows. */
 	XReparentWindow(display, client->window, client->frame, cx, cy);
 	XResizeWindow(display, client->window, cw, ch);
+	XMapWindow(display, client->window);
 	XMapWindow(display, client->frame);
 
 	// Grab the required keys from the frame
 	XGrabButton(display, Button1, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
 	XGrabButton(display, Button3, Mod4Mask, client->window, 1, ButtonPressMask | ButtonReleaseMask | ButtonMotionMask, GrabModeAsync, GrabModeAsync, None, None);
+}
+
+/*
+ * Destroys the frame around the window, preforming any cleanup necessary.
+ * Unmaps the client window and reparents it under the root window.
+ */
+void destroy(struct Workspace *workspace, struct Client *client)
+{
+	XUnmapWindow(display, client->window);
+	XReparentWindow(display, client->window, root, 0, 0);
+
+	XUnmapWindow(display, client->frame);
+	XDestroyWindow(display, client->frame);
+
+	client->frame = 0;
 }

@@ -49,17 +49,6 @@ int getClientWorkspace(Window window, struct Client **retClient, struct Workspac
 	return -1;
 }
 
-// Destroy the frame around a client
-void destroyFrame(struct Client *client)
-{
-	// Unmap the frame window and reparent the client window under the root.
-	XUnmapWindow(display, client->frame);
-	XReparentWindow(display, client->window, root, 0, 0);
-
-	// Destroy the frame
-	XDestroyWindow(display, client->frame);
-}
-
 // Get a client structure given the frame or client window
 struct Client *getClient(Window window)
 {
