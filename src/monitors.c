@@ -18,6 +18,8 @@ struct Monitor *monitorList = NULL;
 static struct Monitor *getSingleMonitor();
 static struct Monitor *getRandRMonitorList();
 static void freeBlankList(struct Monitor *list);
+static int uniqueCounter = 1;
+static int uniqueWorkspaceCounter = 1;
 
 /*
  * Generate a linked list of monitor structure representing the physical
@@ -70,6 +72,7 @@ int detectMonitors()
 			newWorkspace->y = m->y;
 			newWorkspace->width = m->width;
 			newWorkspace->height = m->height;
+			newWorkspace->id = uniqueWorkspaceCounter++;
 			newWorkspace->clients = NULL;
 			newWorkspace->focused = NULL;
 			newWorkspace->clientCount = 0;
@@ -127,6 +130,7 @@ static struct Monitor *getSingleMonitor()
 	m->y = 0;
 	m->width = XDisplayWidth(display, screen);
 	m->height = XDisplayHeight(display, screen);
+	m->id = uniqueCounter++;
 	m->prev = NULL;
 	m->next = NULL;
 	m->workspaces = NULL;
@@ -185,6 +189,7 @@ static struct Monitor *getRandRMonitorList()
 		new->y = mons[i].y;
 		new->width = mons[i].width;
 		new->height = mons[i].height;
+		new->id = uniqueCounter++;
 		new->prev = last;
 		new->next = NULL;
 		new->workspaces = NULL;

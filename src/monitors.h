@@ -8,6 +8,7 @@ struct Monitor {
 	int y;
 	int width;
 	int height;
+	int id;
 	struct Monitor *prev;
 	struct Monitor *next;
 	struct Workspace *workspaces;

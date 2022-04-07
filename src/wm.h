@@ -8,6 +8,7 @@ struct Workspace {
 	int y;
 	int width;
 	int height;
+	int id;
 	struct Client *clients;
 	struct Client *focused;
 	int clientCount;
