@@ -46,7 +46,7 @@ extern void startProgram(char* cmd, int newSession);
 extern int detectMonitors();
 extern void cleanup();
 extern int createSocket(const char *path);
-extern void handleClientRequest(int clientfd);
+extern int handleClientRequest(int clientfd);
 
 int detectWM(Display* display, XErrorEvent* e);
 
@@ -172,7 +172,18 @@ int main(int argc, char** argv)
 		 * is possible to call recv(2). */
 		for (int i = 0; i < nclients; i++) {
 			if (FD_ISSET(clients[i], &readSet)) {
-				handleClientRequest(clients[i]);
+				/* If there was some error we should disconnect
+				 * from the client, close the socket and remove
+				 * it from the array. */
+				if (handleClientRequest(clients[i]) < 0) {
+					close(clients[i]);
+					clients[i] = 0;
+					for (int x = i + 1; x < nclients; x++) {
+						clients[x-1] = clients[x];
+					}
+					clients[4] = 0;
+					nclients--;
+				}
 			}
 		}
 	}

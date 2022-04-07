@@ -83,30 +83,30 @@ int createSocket(const char *path)
  * Performs two recv(2) calls to get the header, and then the payload before
  * calling the function which corresponds to the sxwm_header.type value.
  */
-void handleClientRequest(int clientfd)
+int handleClientRequest(int clientfd)
 {
 	struct sxwm_header header;
 	void *data = SXWMRecieve(clientfd, &header);
 
 	if (!data && header.size != 0) {
 		errorf("Error recieving data: %s", strerror(errno));
-		/* Maybe we should disconnect from this client. */
-		return;
+		return -1;
 	}
 
 	if (header.type > SXWM_MAX) {
 		errorf("Invalid message type (%d)", header.type);
-		/* Maybe we should disconnect from this client. */
 		free(data);
-		return;
+		return -1;
 	}
 
 	int (*function)(int, struct sxwm_header*, void*) = clientHandler[header.type];
+	int ret;
 	if (function) {
-		function(clientfd, &header, data);
+		ret = function(clientfd, &header, data);
 	}
 
 	free(data);
+	return ret;
 }
 
 /*
@@ -119,8 +119,6 @@ int clientEcho(int clientfd, struct sxwm_header *header, void *data)
 {
 	return SXWMSendSeq(clientfd, header->type, header->size, data, header->seq);
 }
-
-#include <stdio.h>
 
 /*
  * Responds to a SXWM_GETMONITORS message, sending the relevant data structures
@@ -145,8 +143,6 @@ int clientGetMonitors(int clientfd, struct sxwm_header *header, void *data)
 	if (!message) {
 		return -1;
 	}
-
-	printf("size: %d\n", size);
 
 	struct sxwm_monitor_spec *monitorSpec = message;
 	char *names = (char*)&(monitorSpec->monitors[nmonitors]);
