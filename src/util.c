@@ -12,8 +12,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//extern int sockfd;
-//extern char socketname[108];
+extern int sockfd;
+extern char socketname[108];
 
 /*
  * Print a formatted message to the standard error stream prepended with the
@@ -118,8 +118,8 @@ void cleanup()
 {
 	if (shmName != NULL) shm_unlink(shmName);
 
-	//if (sockfd) {
-	//	unlink(socketname);
-	//	close(sockfd);
-	//}
+	if (sockfd) {
+		unlink(socketname);
+		close(sockfd);
+	}
 }

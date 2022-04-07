@@ -1,5 +1,4 @@
 #include "sxwm.h"
-#include "util.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -9,29 +8,46 @@
 #include <sxwm.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 GC gc;
 Display* display;
 int width;
 
+int fd = 0;
+
 void draw();
 int drawTags();
 void drawTitle(int xpos);
-extern void cleanup();
+
+void cleanup()
+{
+	if (fd) {
+		close(fd);
+	}
+
+	if (display) {
+		XCloseDisplay(display);
+	}
+
+	shm_unlink(shmName);
+}
 
 int main(int argc, char** argv)
 {
 	atexit(cleanup);
 
 	/* Connect to the window manager. */
-	int fd = SXWMConnectSocket(NULL);
+	fd = SXWMConnectSocket(NULL);
 	if (fd <= 0) {
-		die("Could not connect to window manager.");
+		printf("Could not connect to window manager.\n");
+		return 1;
 	}
 
 	struct sxwm_monitor_spec *monitors = SXWMGetMonitors(fd);
 	if (!monitors) {
-		die("Could not get monitor data.");
+		printf("Could not get monitor data.\n");
+		return -1;
 	}
 
 	printf("n: %d\n", monitors->nmonitors);
@@ -80,10 +96,6 @@ int main(int argc, char** argv)
 			draw();
 		}
 	}
-
-	XCloseDisplay(display);
-
-	shm_unlink(shmName);
 }
 
 void draw() {
