@@ -38,7 +38,8 @@ int main(int argc, char** argv)
 	atexit(cleanup);
 
 	/* Connect to the window manager. */
-	fd = SXWMConnectSocket(NULL);
+	SXWMHandle handle = SXWMConnectSocket(NULL);
+	fd = SXWMSocketFD(handle);
 	if (fd <= 0) {
 		printf("Could not connect to window manager.\n");
 		return 1;

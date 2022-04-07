@@ -6,8 +6,11 @@
  * libsxwm provides functions used to communicate with the SXWM window manager.
  */
 
+typedef int SXWMHandle;
+
 int SXWMDefaultSocketPath(char *buffer);
-int SXWMConnectSocket(const char *path);
+SXWMHandle SXWMConnectSocket(const char *path);
+int SXWMSocketFD(SXWMHandle handle);
 
 struct sxwm_header {
 	uint32_t type;

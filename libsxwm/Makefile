@@ -4,7 +4,7 @@ LIBS =
 OBJDIR = ../obj/libsxwm
 DEPDIR = ../dep/libsxwm
 
-FILES = sendrecv sockets slow/monitors
+FILES = handles sendrecv sockets slow/monitors
 
 .PHONY: all clean
 
