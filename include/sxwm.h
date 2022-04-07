@@ -16,6 +16,7 @@ struct sxwm_header {
 };
 
 int SXWMSend(int socket, uint32_t type, uint32_t size, void *data);
+int SXWMSendSeq(int socket, uint32_t type, uint32_t size, void *data, int seq);
 void *SXWMRecieve(int socket, struct sxwm_header *header);
 
 #define SXWM_IGNORE ((uint32_t)0)

@@ -112,5 +112,5 @@ void handleClientRequest(int clientfd)
  */
 int clientEcho(int clientfd, struct sxwm_header *header, void *data)
 {
-	return SXWMSend(clientfd, header->type, header->size, data);
+	return SXWMSendSeq(clientfd, header->type, header->size, data, header->seq);
 }
