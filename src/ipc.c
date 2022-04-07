@@ -1,6 +1,7 @@
 #include "util.h"
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sxwm.h>
 #include <sys/socket.h>
@@ -9,6 +10,12 @@
 
 int sockfd;
 char socketname[108];
+
+int clientEcho(int clientfd, struct sxwm_header *header, void *data);
+
+int (*clientHandler[SXWM_MAX+1])(int, struct sxwm_header*, void*) = {
+	[SXWM_ECHO] = clientEcho
+};
 
 /*
  * Create a UNIX socket at the given path, or choose a default path based on
@@ -62,4 +69,48 @@ int createSocket(const char *path)
 	sockfd = fd;
 
 	return 0;
+}
+
+/*
+ * Recieve and (possibly) respond to a message from a client over the given
+ * socket.
+ *
+ * Performs two recv(2) calls to get the header, and then the payload before
+ * calling the function which corresponds to the sxwm_header.type value.
+ */
+void handleClientRequest(int clientfd)
+{
+	struct sxwm_header header;
+	void *data = SXWMRecieve(clientfd, &header);
+
+	if (data == (void*)-1) {
+		errorf("Error recieving data: %s", strerror(errno));
+		/* Maybe we should disconnect from this client. */
+		return;
+	}
+
+	if (header.type > SXWM_MAX) {
+		errorf("Invalid message type (%d)", header.type);
+		/* Maybe we should disconnect from this client. */
+		free(data);
+		return;
+	}
+
+	int (*function)(int, struct sxwm_header*, void*) = clientHandler[header.type];
+	if (function) {
+		function(clientfd, &header, data);
+	}
+
+	free(data);
+}
+
+/*
+ * Respond to a SXWM_ECHO message by sending the given data back to the client.
+ *
+ * On success returns 0.
+ * On failure returns -1.
+ */
+int clientEcho(int clientfd, struct sxwm_header *header, void *data)
+{
+	return SXWMSend(clientfd, header->type, header->size, data);
 }

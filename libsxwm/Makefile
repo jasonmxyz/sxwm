@@ -1,10 +1,10 @@
 CC = gcc
-CFLAGS = -std=gnu11 -g -fPIC
+CFLAGS = -I../include -std=gnu11 -g -fPIC
 LIBS =
 OBJDIR = ../obj/libsxwm
 DEPDIR = ../dep/libsxwm
 
-FILES = sockets
+FILES = sendrecv sockets
 
 .PHONY: all clean
 
