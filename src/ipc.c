@@ -83,7 +83,7 @@ void handleClientRequest(int clientfd)
 	struct sxwm_header header;
 	void *data = SXWMRecieve(clientfd, &header);
 
-	if (data == (void*)-1) {
+	if (!data) {
 		errorf("Error recieving data: %s", strerror(errno));
 		/* Maybe we should disconnect from this client. */
 		return;
