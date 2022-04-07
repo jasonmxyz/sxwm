@@ -7,14 +7,12 @@
 #include <string.h>
 #include <sxwm.h>
 #include <sys/mman.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 GC gc;
 Display* display;
 int width;
 
-int fd = 0;
+SXWMHandle handle;
 
 void draw();
 int drawTags();
@@ -22,8 +20,8 @@ void drawTitle(int xpos);
 
 void cleanup()
 {
-	if (fd) {
-		close(fd);
+	if (handle) {
+		SXWMDisconnectSocket(handle);
 	}
 
 	if (display) {
@@ -38,14 +36,13 @@ int main(int argc, char** argv)
 	atexit(cleanup);
 
 	/* Connect to the window manager. */
-	SXWMHandle handle = SXWMConnectSocket(NULL);
-	fd = SXWMSocketFD(handle);
-	if (fd <= 0) {
+	handle = SXWMConnectSocket(NULL);
+	if (!handle) {
 		printf("Could not connect to window manager.\n");
 		return 1;
 	}
 
-	struct sxwm_monitor_spec *monitors = SXWMGetMonitors(fd);
+	struct sxwm_monitor_spec *monitors = SXWMGetMonitors(handle);
 	if (!monitors) {
 		printf("Could not get monitor data.\n");
 		return -1;

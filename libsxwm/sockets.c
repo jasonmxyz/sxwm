@@ -116,6 +116,8 @@ SXWMHandle SXWMConnectSocket(const char *path)
  * function, checks that the returned handle data is of the SXWM_HANDLE_SOCKET
  * type, then returns the stored file descriptor.
  *
+ * On success returns a positive integer file descriptor.
+ * On failure returns -1 and sets errno to indicate the error.
  * Errors:
  *  EINVAL: The given handle does not match a socket object.
  */
@@ -134,4 +136,29 @@ int SXWMSocketFD(const SXWMHandle handle)
 	}
 
 	return socketHandle->socket.fd;
+}
+
+/*
+ * Disconnect the socket assocated with the given handle and delete data
+ * associated with it.
+ *
+ * Calls SXWMSocketFD to get the file descriptor, then closes the socket before
+ * calling SXWMRemoveHandle. We do not test the result of close(2), we trust
+ * that the file descriptor was closed. See the notes section of close(2).
+ *
+ * On success returns 0.
+ * On failure returns -1 and sets errno to indicate the error.
+ * Errors:
+ *  EINVAL: The given handle does not match a socket object.
+ */
+int SXWMDisconnectSocket(const SXWMHandle handle)
+{
+	int fd = SXWMSocketFD(handle);
+	if (fd < 0) {
+		return -1;
+	}
+
+	close(fd);
+
+	return SXWMRemoveHandle(handle);
 }

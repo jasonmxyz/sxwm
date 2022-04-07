@@ -10,6 +10,7 @@ typedef int SXWMHandle;
 
 int SXWMDefaultSocketPath(char *buffer);
 SXWMHandle SXWMConnectSocket(const char *path);
+int SXWMDisconnectSocket(SXWMHandle handle);
 int SXWMSocketFD(SXWMHandle handle);
 
 struct sxwm_header {
@@ -41,4 +42,4 @@ struct sxwm_monitor_spec {
 	struct sxwm_monitor_spec_item monitors[];
 };
 
-struct sxwm_monitor_spec *SXWMGetMonitors(int socket);
+struct sxwm_monitor_spec *SXWMGetMonitors(SXWMHandle handle);
