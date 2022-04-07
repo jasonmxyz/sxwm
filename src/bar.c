@@ -28,6 +28,26 @@ int main(int argc, char** argv)
 	if (fd <= 0) {
 		die("Could not connect to window manager.");
 	}
+
+	struct sxwm_monitor_spec *monitors = SXWMGetMonitors(fd);
+	if (!monitors) {
+		die("Could not get monitor data.");
+	}
+
+	printf("n: %d\n", monitors->nmonitors);
+	for (int i = 0; i < monitors->nmonitors; i++) {
+		struct sxwm_monitor_spec_item *m = &(monitors->monitors[i]);
+		printf("%d:\n", i);
+		printf("x: %d\n", m->x);
+		printf("y: %d\n", m->y);
+		printf("w: %d\n", m->width);
+		printf("h: %d\n", m->height);
+		printf("nameoffset: %d\n", m->nameoffset);
+		printf("name: %s\n", &(((char*)monitors)[m->nameoffset]));
+		printf("id: %d\n", m->id);
+	}
+	
+	free(monitors);
 	
 	// Create the shared memory
 	createShared(1);

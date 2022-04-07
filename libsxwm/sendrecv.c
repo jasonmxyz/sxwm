@@ -58,7 +58,7 @@ int SXWMSendSeq(int socket, uint32_t type, uint32_t size, void *data, int seq)
 
 	/* If send succeeded, but did not send the whole message, we would be
 	 * in trouble. */
-	if (sent != sizeof(struct sxwm_header)) {
+	if (sent != sizeof(struct sxwm_header) + size) {
 		return -1;
 	}
 
@@ -93,8 +93,10 @@ int SXWMSend(int socket, uint32_t type, uint32_t size, void *data)
  * payload.
  *
  * On success returns a pointer to the contents of the message. This pointer
- *                    must later be passed in a call to free(3).
- * On failure returns null and sets errno to indicate the error.
+ *                    must later be passed in a call to free(3). If the size of
+ *                    the payload is zero, then the returned value is null, so
+ *                    errno should always be tested.
+ * On failure returns sets errno to indicate the error.
  * Errors:
  *  ENOMEM: Could not allocate memory to store the message.
  *  0: The whole message was not sent, this is bad...
@@ -109,16 +111,19 @@ void *SXWMRecieve(int socket, struct sxwm_header *header)
 		return NULL;
 	}
 
-	void *payload = malloc(header->size);
-	/* This would also be really bad. */
-	if (!payload) {
-		return NULL;
-	}
+	void *payload = NULL;
+	if (header->size > 0) {
+		payload = malloc(header->size);
+		/* This would also be really bad. */
+		if (!payload) {
+			return NULL;
+		}
 
-	got = recv(socket, payload, header->size, 0);
-	/* This would also be really bad. */
-	if (got != header->size) {
-		return NULL;
+		got = recv(socket, payload, header->size, 0);
+		/* This would also be really bad. */
+		if (got != header->size) {
+			return NULL;
+		}
 	}
 
 	return payload;

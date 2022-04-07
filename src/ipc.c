@@ -1,3 +1,4 @@
+#include "monitors.h"
 #include "util.h"
 
 #include <errno.h>
@@ -12,10 +13,14 @@ int sockfd;
 char socketname[108];
 
 int clientEcho(int clientfd, struct sxwm_header *header, void *data);
+int clientGetMonitors(int clientfd, struct sxwm_header *header, void *data);
 
 int (*clientHandler[SXWM_MAX+1])(int, struct sxwm_header*, void*) = {
-	[SXWM_ECHO] = clientEcho
+	[SXWM_ECHO] = clientEcho,
+	[SXWM_GETMONITORS] = clientGetMonitors
 };
+
+extern struct Monitor *monitorList;
 
 /*
  * Create a UNIX socket at the given path, or choose a default path based on
@@ -83,7 +88,7 @@ void handleClientRequest(int clientfd)
 	struct sxwm_header header;
 	void *data = SXWMRecieve(clientfd, &header);
 
-	if (!data) {
+	if (!data && header.size != 0) {
 		errorf("Error recieving data: %s", strerror(errno));
 		/* Maybe we should disconnect from this client. */
 		return;
@@ -113,4 +118,60 @@ void handleClientRequest(int clientfd)
 int clientEcho(int clientfd, struct sxwm_header *header, void *data)
 {
 	return SXWMSendSeq(clientfd, header->type, header->size, data, header->seq);
+}
+
+#include <stdio.h>
+
+/*
+ * Responds to a SXWM_GETMONITORS message, sending the relevant data structures
+ * to the client.
+ *
+ * On success returns 0.
+ * On failure returns -1.
+ */
+int clientGetMonitors(int clientfd, struct sxwm_header *header, void *data)
+{
+	/* Calculate the size of the data to send. */
+	int size = sizeof(struct sxwm_monitor_spec);
+	int nmonitors = 0;
+	for (struct Monitor *m = monitorList; m; m = m->next) {
+		nmonitors++;
+		size += strlen(m->name);
+	}
+	size += nmonitors * (sizeof(struct sxwm_monitor_spec_item) + 1);
+
+	/* Allocate the message data. */
+	void *message = malloc(size);
+	if (!message) {
+		return -1;
+	}
+
+	printf("size: %d\n", size);
+
+	struct sxwm_monitor_spec *monitorSpec = message;
+	char *names = (char*)&(monitorSpec->monitors[nmonitors]);
+
+	/* Fill in the structures. */
+	monitorSpec->nmonitors = nmonitors;
+	int i = 0;
+	for (struct Monitor *m = monitorList; m; m = m->next) {
+		struct sxwm_monitor_spec_item *item = &(monitorSpec->monitors[i++]);
+
+		/* Copy the name into the free space at the end, advance the
+		 * 'names' pointer and add it to the structure. */
+		int len = strlen(m->name) + 1;
+		memcpy(names, m->name, len);
+		item->nameoffset = (void*)names - message;
+		names += len;
+
+		item->id = m->id;
+		item->x = m->x;
+		item->y = m->y;
+		item->width = m->width;
+		item->height = m->height;
+	}
+
+	int ret = SXWMSendSeq(clientfd, header->type, size, message, header->seq);
+	free(message);
+	return ret;
 }

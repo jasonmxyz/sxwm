@@ -21,4 +21,21 @@ void *SXWMRecieve(int socket, struct sxwm_header *header);
 
 #define SXWM_IGNORE ((uint32_t)0)
 #define SXWM_ECHO ((uint32_t)1)
-#define SXWM_MAX ((uint32_t)1)
+#define SXWM_GETMONITORS ((uint32_t)2)
+#define SXWM_MAX ((uint32_t)2)
+
+struct sxwm_monitor_spec_item {
+	int nameoffset;
+	int id;
+	int x;
+	int y;
+	int width;
+	int height;
+};
+
+struct sxwm_monitor_spec {
+	int nmonitors;
+	struct sxwm_monitor_spec_item monitors[];
+};
+
+struct sxwm_monitor_spec *SXWMGetMonitors(int socket);
