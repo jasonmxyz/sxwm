@@ -42,23 +42,28 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	struct sxwm_monitor_spec *monitors = SXWMGetMonitors(handle);
+	int nMonitors = 0;
+	struct sxwm_monitor *monitors = SXWMGetMonitors(handle, &nMonitors);
 	if (!monitors) {
 		printf("Could not get monitor data.\n");
 		return -1;
 	}
 
-	printf("n: %d\n", monitors->nmonitors);
-	for (int i = 0; i < monitors->nmonitors; i++) {
-		struct sxwm_monitor_spec_item *m = &(monitors->monitors[i]);
+	printf("n: %d\n", nMonitors);
+	for (int i = 0; i < nMonitors; i++) {
+		struct sxwm_monitor *m = &(monitors[i]);
 		printf("%d:\n", i);
-		printf("x: %d\n", m->x);
-		printf("y: %d\n", m->y);
-		printf("w: %d\n", m->width);
-		printf("h: %d\n", m->height);
-		printf("nameoffset: %d\n", m->nameoffset);
-		printf("name: %s\n", &(((char*)monitors)[m->nameoffset]));
-		printf("id: %d\n", m->id);
+		printf("id: %d\n", monitors[i].id);
+		printf("name: %s\n", monitors[i].name);
+		printf("x: %d\n", monitors[i].x);
+		printf("y: %d\n", monitors[i].y);
+		printf("w: %d\n", monitors[i].width);
+		printf("h: %d\n", monitors[i].height);
+		printf("workspaces: %d (%d) :", monitors[i].nWorkspaces, monitors[i].selectedWorkspace);
+		for (int j = 0; j < monitors[i].nWorkspaces; j++) {
+			printf(" %d", monitors[i].workspaces[j]);
+		}
+		printf("\n");
 	}
 	
 	free(monitors);

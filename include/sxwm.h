@@ -28,18 +28,16 @@ void *SXWMRecieve(int socket, struct sxwm_header *header);
 #define SXWM_GETMONITORS ((uint32_t)2)
 #define SXWM_MAX ((uint32_t)2)
 
-struct sxwm_monitor_spec_item {
-	int nameoffset;
-	int id;
-	int x;
-	int y;
-	int width;
-	int height;
+struct sxwm_monitor {
+	uint32_t id;
+	char *name;
+	uint32_t x;
+	uint32_t y;
+	uint32_t width;
+	uint32_t height;
+	uint32_t nWorkspaces;
+	uint32_t selectedWorkspace;
+	uint32_t *workspaces;
 };
 
-struct sxwm_monitor_spec {
-	int nmonitors;
-	struct sxwm_monitor_spec_item monitors[];
-};
-
-struct sxwm_monitor_spec *SXWMGetMonitors(SXWMHandle handle);
+struct sxwm_monitor *SXWMGetMonitors(SXWMHandle handle, int *retN);

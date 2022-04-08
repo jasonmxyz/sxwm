@@ -1,5 +1,6 @@
 obj
 dep
 sxwm
+!include/sxwm
 sxwmbar
 libsxwm/libsxwm.so

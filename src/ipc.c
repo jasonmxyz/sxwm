@@ -1,10 +1,13 @@
 #include "monitors.h"
 #include "util.h"
+#include "wm.h"
 
 #include <errno.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sxwm.h>
+#include <sxwm/msg.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -122,51 +125,93 @@ int clientEcho(int clientfd, struct sxwm_header *header, void *data)
 
 /*
  * Responds to a SXWM_GETMONITORS message, sending the relevant data structures
- * to the client.
+ * to the client. The message is described in docs/message/getmonitors.md.
  *
  * On success returns 0.
- * On failure returns -1.
+ * On failure returns -1 and sets errno to indicate the error.
+ * Errors:
+ *  errno may be set by malloc(3) or SXWMSendSeq.
  */
 int clientGetMonitors(int clientfd, struct sxwm_header *header, void *data)
 {
-	/* Calculate the size of the data to send. */
-	int size = sizeof(struct sxwm_monitor_spec);
-	int nmonitors = 0;
+	/* Calculate the size of the message to send. */
+	int nMonitors = 0;
+	int nWorkspaces = 0;
+	int namesLength = 0;
 	for (struct Monitor *m = monitorList; m; m = m->next) {
-		nmonitors++;
-		size += strlen(m->name);
-	}
-	size += nmonitors * (sizeof(struct sxwm_monitor_spec_item) + 1);
+		nMonitors++;
 
-	/* Allocate the message data. */
+		for (struct Workspace *w = m->workspaces; w; w = w->next) {
+			nWorkspaces++;
+		}
+
+		namesLength += strlen(m->name) + 1;
+	}
+	int size = sizeof(struct sxwm_message_getmonitors_header)
+		 + ( sizeof(struct sxwm_message_getmonitors_monitordata)
+		     * nMonitors )
+		 + ( sizeof(uint32_t) * nWorkspaces )
+		 + namesLength;
+	
+	/* Allocate space for the message. */
 	void *message = malloc(size);
 	if (!message) {
+		/* malloc(3) sets errno. */
 		return -1;
 	}
 
-	struct sxwm_monitor_spec *monitorSpec = message;
-	char *names = (char*)&(monitorSpec->monitors[nmonitors]);
+	/* Create some useful pointers to the sections in the message. */
+	struct sxwm_message_getmonitors_header *msgHeader;
+	struct sxwm_message_getmonitors_monitordata *monitorData;
+	uint32_t *workspaces;
+	char *names;
 
-	/* Fill in the structures. */
-	monitorSpec->nmonitors = nmonitors;
-	int i = 0;
+	msgHeader = message;
+	monitorData = (void*)msgHeader
+		    + sizeof(struct sxwm_message_getmonitors_header);
+	workspaces = (void*)monitorData
+		   + ( sizeof(struct sxwm_message_getmonitors_monitordata)
+		       * nMonitors );
+	names = (void*)workspaces
+	      + ( sizeof(uint32_t) * nWorkspaces );
+	
+	/* Allows us to index in the arrays. */
+	int monitorN = 0;
+	int workspacesN = 0;
+	char *nextName = names;
+
+	/* Go through the monitor list again. */
 	for (struct Monitor *m = monitorList; m; m = m->next) {
-		struct sxwm_monitor_spec_item *item = &(monitorSpec->monitors[i++]);
+		monitorData[monitorN].id = m->id;
+		monitorData[monitorN].nameOffset = nextName - names;
+		monitorData[monitorN].x = m->x;
+		monitorData[monitorN].y = m->y;
+		monitorData[monitorN].width = m->width;
+		monitorData[monitorN].height = m->height;
+		monitorData[monitorN].workspacesOffset = workspacesN;
+		monitorData[monitorN].selectedWorkspace = m->workspaces->id;
 
-		/* Copy the name into the free space at the end, advance the
-		 * 'names' pointer and add it to the structure. */
-		int len = strlen(m->name) + 1;
-		memcpy(names, m->name, len);
-		item->nameoffset = (void*)names - message;
-		names += len;
+		int localNworkspaces = 0;
+		for (struct Workspace *w = m->workspaces; w; w = w->next) {
+			workspaces[workspacesN++] = w->id;
+			localNworkspaces++;
+		}
+		monitorData[monitorN].nWorkspaces = localNworkspaces;
 
-		item->id = m->id;
-		item->x = m->x;
-		item->y = m->y;
-		item->width = m->width;
-		item->height = m->height;
+		int nameLen = strlen(m->name) + 1;
+		memcpy(nextName, m->name, nameLen);
+		nextName += nameLen;
+
+		monitorN++;
 	}
+	
+	/* Populate the header fields. */
+	msgHeader->nMonitors = monitorN;
+	msgHeader->monitorDataOffset = (void*)monitorData - message;
+	msgHeader->workspaceIDsOffset = (void*)workspaces - message;
+	msgHeader->namesOffset = (void*)names - message;
 
+	/* Send the message with the same header type and sequence number. */
 	int ret = SXWMSendSeq(clientfd, header->type, size, message, header->seq);
 	free(message);
 	return ret;
